@@ -4,7 +4,7 @@ export default function CrispChat() {
   useEffect(() => {
     // 1. Initialize Crisp's global configuration arrays on the window object
     window.$crisp = [];
-    window.CRISP_WEBSITE_ID = "7e3e0aeb-d5da-4ced-996a-24bf127587f8";
+    window.CRISP_WEBSITE_ID = "a1ed0ab7-8a53-4a4a-9131-cb53ffaa5121";
 
     const injectScript = () => {
       // Prevent duplicate script elements if the component re-renders
