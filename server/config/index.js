@@ -26,7 +26,7 @@ export const connectDB = async () => {
                 const noCreds = uri.replace(/\/\/.*?@/, '//');
                 const host = noCreds.split('/')[2];
                 console.log(host.includes('uvcdzhq') ? 'ON SERVER DB' : `${host.includes('cioyswh') ? 'ON PROD DB' : 'UNKNOWN DB'}`);
-                console.log(`Mongo target host: ${host}`);
+                console.log(`Mongo current target host: ${host}`);
             } catch (e) {
                 console.log('Mongo target host: (unavailable)');
             }
