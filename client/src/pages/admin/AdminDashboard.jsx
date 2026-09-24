@@ -27,6 +27,7 @@ import {
     Briefcase,
     UserPlus,
     Check,
+    Copy,
     X,
     AlertTriangle
 } from 'lucide-react';
@@ -62,6 +63,14 @@ const AdminDashboard = () => {
         { title: 'Active Users', value: '0', change: '+0%', icon: Users, color: 'purple' },
         { title: 'Pending Filings', value: '0', change: '0%', icon: Clock, color: 'yellow' }
     ]);
+    const [copiedId, setCopiedId] = useState(null);
+
+    const copyToClipboard = async (text, key) => {
+        await navigator.clipboard.writeText(text);
+        setCopiedId(key);
+
+        setTimeout(() => setCopiedId(null), 1500);
+    };
 
     const handleLogout = () => {
         logout();
@@ -113,7 +122,7 @@ const AdminDashboard = () => {
                 setLoading(false);
                 return;
             }
-
+            console.log("Fetching admin data...");
             const results = await Promise.allSettled(requests);
             
             let usersData = [], paymentsData = [], itrsData = [], requestsData = [];
@@ -165,6 +174,7 @@ const AdminDashboard = () => {
             setFilings(mappedFilings);
 
             calculateStats(usersData, mappedFilings, paymentsData);
+            console.log("LOADING COMPLETED")
 
         } catch (error) {
             console.error('Error fetching admin data:', error);
@@ -174,8 +184,9 @@ const AdminDashboard = () => {
     };
 
     const calculateStats = (usersList, filingsList, paymentsList) => {
+        console.log(paymentsList)
         const totalRevenue = paymentsList.reduce((acc, payment) => {
-            const price = payment.planId?.price || payment.planPrice || 0;
+            const price =  payment.finalAmountPaid || 0;
             return acc + price;
         }, 0);
         const pendingCount = filingsList.filter(f =>
@@ -300,27 +311,61 @@ const AdminDashboard = () => {
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, index) => {
-                    const Icon = stat.icon;
-                    return (
-                        <div key={index} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden group hover:border-zinc-700 transition-all">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-zinc-800 text-zinc-400 group-hover:text-white transition-colors`}>
-                                    <Icon size={20} />
-                                </div>
-                                <span className={`text-xs font-medium px-2 py-1 rounded-lg ${stat.change.startsWith('+') ? 'text-emerald-500 bg-emerald-500/10' : 'text-rose-500 bg-rose-500/10'}`}>
-                                    {stat.change}
-                                </span>
-                            </div>
-                            <h3 className="text-zinc-400 text-sm font-medium mb-1">{stat.title}</h3>
-                            <p className="text-2xl font-bold text-white tracking-tight">{stat.value}</p>
-                            <div className="absolute -right-2 -bottom-2 opacity-5 transform group-hover:scale-110 transition-transform">
-                                <Icon size={80} />
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+    {loading
+        ? Array.from({ length: 4 }).map((_, index) => (
+              <div
+                  key={index}
+                  className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 animate-pulse"
+              >
+                  <div className="flex items-center justify-between mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-zinc-800"></div>
+                      <div className="w-12 h-6 rounded-lg bg-zinc-800"></div>
+                  </div>
+
+                  <div className="h-4 w-24 bg-zinc-800 rounded mb-3"></div>
+
+                  <div className="h-8 w-20 bg-zinc-700 rounded"></div>
+              </div>
+          ))
+        : stats.map((stat, index) => {
+              const Icon = stat.icon;
+
+              return (
+                  <div
+                      key={index}
+                      className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden group hover:border-zinc-700 transition-all"
+                  >
+                      <div className="flex items-center justify-between mb-4">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-zinc-800 text-zinc-400 group-hover:text-white transition-colors">
+                              <Icon size={20} />
+                          </div>
+
+                          <span
+                              className={`text-xs font-medium px-2 py-1 rounded-lg ${
+                                  stat.change.startsWith("+")
+                                      ? "text-emerald-500 bg-emerald-500/10"
+                                      : "text-rose-500 bg-rose-500/10"
+                              }`}
+                          >
+                              {stat.change}
+                          </span>
+                      </div>
+
+                      <h3 className="text-zinc-400 text-sm font-medium mb-1">
+                          {stat.title}
+                      </h3>
+
+                      <p className="text-2xl font-bold text-white tracking-tight">
+                          {stat.value}
+                      </p>
+
+                      <div className="absolute -right-2 -bottom-2 opacity-5 transform group-hover:scale-110 transition-transform">
+                          <Icon size={80} />
+                      </div>
+                  </div>
+              );
+          })}
+</div>
 
             {/* Main Section */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -338,35 +383,68 @@ const AdminDashboard = () => {
                                 <tr>
                                     <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Client</th>
                                     <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Service</th>
+                                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-right">Amount(MRP)</th>
                                     <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Status</th>
-                                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-right">Amount</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-800/50">
-                                {filings.slice(0, 5).map((filing) => (
-                                    <tr key={filing.id} className="hover:bg-zinc-800/30 transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-xs font-bold">
-                                                    {filing.clientName[0]}
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors">{filing.clientName}</p>
-                                                    <p className="text-[10px] text-zinc-500 font-mono">#{filing.id}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-sm text-zinc-400">{filing.service}</p>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            {getStatusBadge(filing.status)}
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <p className="text-sm font-bold text-white">{filing.amount}</p>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {loading
+    ? [...Array(5)].map((_, index) => (
+        <tr key={index} className="animate-pulse">
+            <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-zinc-800"></div>
+                    <div>
+                        <div className="h-4 w-28 bg-zinc-800 rounded mb-2"></div>
+                        <div className="h-3 w-20 bg-zinc-800 rounded"></div>
+                    </div>
+                </div>
+            </td>
+
+            <td className="px-6 py-4">
+                <div className="h-4 w-32 bg-zinc-800 rounded"></div>
+            </td>
+
+            <td className="px-6 py-4">
+                <div className="h-6 w-20 bg-zinc-800 rounded-full"></div>
+            </td>
+
+            <td className="px-6 py-4 text-right">
+                <div className="h-4 w-14 bg-zinc-800 rounded ml-auto"></div>
+            </td>
+        </tr>
+    ))
+    : filings.slice(0, 5).map((filing) => (
+        <tr key={filing.id} className="hover:bg-zinc-800/30 transition-colors group">
+            <td className="px-6 py-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 text-xs font-bold">
+                        {filing.clientName[0]}
+                    </div>
+                    <div>
+                        <p className="text-sm font-medium text-zinc-200 group-hover:text-white transition-colors">
+                            {filing.clientName  }
+                        </p>
+                        <p className="text-[10px] text-zinc-500 font-mono">
+                            #{filing.id}x
+                        </p>
+                    </div>
+                </div>
+            </td>
+
+            <td className="px-6 py-4">
+                <p className="text-sm text-zinc-400">{filing.service}</p>
+            </td>
+
+            <td className="px-6 py-4 text-center">
+                <p className="text-sm font-bold text-white">{filing.amount}</p>
+            </td>
+
+            <td className="px-6 py-4">
+                {getStatusBadge(filing.status)}
+            </td>
+        </tr>
+    ))}
                             </tbody>
                         </table>
                     </div>
@@ -375,28 +453,68 @@ const AdminDashboard = () => {
                 {/* Sidebar Activity/Stats */}
                 <div className="space-y-6">
                     <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-                        <h3 className="text-lg font-semibold text-white mb-6">User Distribution</h3>
-                        <div className="space-y-4">
-                            {[
-                                { label: 'Regular Users', count: users.filter(u => u.role === 'user').length, color: 'bg-blue-500' },
-                                { label: 'Admins', count: users.filter(u => u.role === 'admin').length, color: 'bg-emerald-500' },
-                                { label: 'CA Partners', count: users.filter(u => u.role === 'ca').length, color: 'bg-purple-500' },
-                            ].map((item, i) => (
-                                <div key={i}>
-                                    <div className="flex justify-between text-sm mb-2">
-                                        <span className="text-zinc-400">{item.label}</span>
-                                        <span className="text-white font-bold">{item.count}</span>
-                                    </div>
-                                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                                        <div
-                                            className={`${item.color} h-full transition-all duration-1000`}
-                                            style={{ width: `${(item.count / users.length) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+    <h3 className="text-lg font-semibold text-white mb-6">
+        User Distribution
+    </h3>
+
+    {loading ? (
+        <div className="space-y-5 animate-pulse">
+            {[1, 2, 3].map((_, i) => (
+                <div key={i}>
+                    <div className="flex justify-between mb-2">
+                        <div className="h-4 w-28 bg-zinc-800 rounded"></div>
+                        <div className="h-4 w-8 bg-zinc-800 rounded"></div>
                     </div>
+
+                    <div className="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+                        <div
+                            className="h-full rounded-full bg-gradient-to-r from-zinc-700 via-zinc-600 to-zinc-700 animate-pulse"
+                            style={{
+                                width: `${60 + i * 15}%`,
+                            }}
+                        />
+                    </div>
+                </div>
+            ))}
+        </div>
+    ) : (
+        <div className="space-y-4">
+            {[
+                {
+                    label: 'Regular Users',
+                    count: users.filter(u => u.role === 'user').length,
+                    color: 'bg-blue-500'
+                },
+                {
+                    label: 'Admins',
+                    count: users.filter(u => u.role === 'admin').length,
+                    color: 'bg-emerald-500'
+                },
+                {
+                    label: 'CA Partners',
+                    count: users.filter(u => u.role === 'ca').length,
+                    color: 'bg-purple-500'
+                },
+            ].map((item, i) => (
+                <div key={i}>
+                    <div className="flex justify-between text-sm mb-2">
+                        <span className="text-zinc-400">{item.label}</span>
+                        <span className="text-white font-bold">{item.count}</span>
+                    </div>
+
+                    <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                        <div
+                            className={`${item.color} h-full transition-all duration-1000`}
+                            style={{
+                                width: `${(item.count / users.length) * 100}%`
+                            }}
+                        />
+                    </div>
+                </div>
+            ))}
+        </div>
+    )}
+</div>
 
                     <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-6 text-white overflow-hidden relative group cursor-pointer">
                         <div className="relative z-10">
@@ -570,6 +688,7 @@ const AdminDashboard = () => {
             order.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             order.transactionId.toLowerCase().includes(searchQuery.toLowerCase())
         );
+        console.log(filteredOrders);
 
         return (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -612,8 +731,24 @@ const AdminDashboard = () => {
                                 {filteredOrders.map((order) => (
                                     <tr key={order.id} className="hover:bg-zinc-800/30 transition-colors group">
                                         <td className="px-6 py-5">
-                                            <p className="text-sm font-mono text-zinc-500 tracking-tight">{order.transactionId}</p>
-                                            <p className="text-[9px] text-zinc-600 font-mono mt-1 uppercase tracking-wider">Order ID: {order.id}</p>
+                                            <div className="flex items-center gap-2">
+                            <p className="text-sm text-zinc-400 font-mono truncate max-w-[110px]">
+                                {order.transactionId}
+                            </p>
+
+                            <button
+                                onClick={() =>
+                                    copyToClipboard(order.transactionId, order.transactionId)
+                                }
+                                className="text-zinc-500 hover:text-white transition-colors"
+                            >
+                                {copiedId === order.transactionId ? (
+                                    <Check size={14} className="text-green-500" />
+                                ) : (
+                                    <Copy size={14} />
+                                )}
+                            </button>
+                        </div>
                                         </td>
                                         <td className="px-6 py-5">
                                             <div>
@@ -623,7 +758,18 @@ const AdminDashboard = () => {
                                         </td>
                                         <td className="px-6 py-5">
                                             <p className="text-sm text-white font-medium">{order.service}</p>
-                                            <p className="text-[10px] font-bold text-zinc-500 mt-0.5 tracking-wider uppercase">{order.amount}</p>
+                                        <div className="flex align-end items-end gap-1">
+                                            <p className="font-bold text-zinc-200 text-sm">
+                                            ₹{order.originalData.finalAmountPaid}
+                                            </p>
+
+                                            {order.originalData.finalAmountPaid < order.originalData.originalPrice && (
+                                            <p className="text-[10px] text-zinc-200 line-through opacity-50">
+                                                ₹{order.originalData.originalPrice}
+                                            </p>
+                                            )}
+                                        </div>
+                                            
                                         </td>
                                         <td className="px-6 py-5 text-sm text-zinc-400">{new Date(order.date).toLocaleDateString()}</td>
                                         <td className="px-6 py-5">
@@ -658,6 +804,7 @@ const AdminDashboard = () => {
             filing.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             filing.id.toLowerCase().includes(searchQuery.toLowerCase())
         );
+        console.log(filteredFilings);
 
         return (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -693,7 +840,7 @@ const AdminDashboard = () => {
                                     <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Service Plan</th>
                                     <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Submitted</th>
                                     <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Status</th>
-                                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-right">Actions</th>
+                                    <th className="px-6 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-zinc-800/50">
@@ -706,18 +853,28 @@ const AdminDashboard = () => {
                                                     <Users size={16} />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-bold text-zinc-200 group-hover:text-blue-400 transition-colors cursor-pointer">{filing.clientName}</p>
+                                                    <p className="text-sm font-bold text-zinc-200 transition-colors">{filing.clientName}</p>
                                                     <p className="text-[10px] text-zinc-500">{filing.clientEmail}</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <p className="text-sm text-white font-medium">{filing.service}</p>
-                                            <p className="text-[10px] font-bold text-zinc-500 mt-0.5 tracking-wider uppercase">{filing.amount}</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-bold text-zinc-200 text-xl">
+                                            ₹{filing.originalData.purchaseId.finalAmountPaid}
+                                            </p>
+
+                                            {filing.originalData.purchaseId.finalAmountPaid <
+                                            filing.originalData.purchaseId.originalPrice && (
+                                            <p className="text-sm text-zinc-500 line-through">
+                                                ₹{filing.originalData.purchaseId.originalPrice}
+                                            </p>
+                                            )}
+                                        </div>
                                         </td>
                                         <td className="px-6 py-5 text-sm text-zinc-400">{new Date(filing.date).toLocaleDateString()}</td>
                                         <td className="px-6 py-5">{getStatusBadge(filing.status)}</td>
-                                        <td className="px-6 py-5 text-right">
+                                        <td className="px-6 py-5">
                                             <button
                                                 onClick={() => navigate(`/admin/order/${filing.originalData?.purchaseId?._id || filing.originalData?.purchaseId}`)}
                                                 className="inline-flex items-center gap-2 bg-blue-600/10 hover:bg-blue-600 text-blue-500 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition-all"

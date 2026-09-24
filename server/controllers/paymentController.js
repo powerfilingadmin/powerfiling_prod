@@ -58,6 +58,39 @@ export const createOrder = asyncHandler(async (req, res, next) => {
         cashbackCoinsUsed,
     });
 
+     // ── MOCK BYPASS ──────────────────────────────────────────────────────────
+    if (process.env.ALLOW_MOCK_PAYMENTS === 'true') {
+        const mockOrderId = `mock_${req.user.id}_${Date.now()}`;
+
+        await PendingPayment.create({
+            orderId: mockOrderId,
+            userId: req.user.id,
+            planId: pricing.plan._id,
+            serviceId: serviceId || null,
+            planName: pricing.plan.name,
+            planPrice: pricing.planPrice,
+            referralCoinsUsed: pricing.referralCoinsUsed,
+            cashbackCoinsUsed: pricing.cashbackCoinsUsed,
+            coinDiscountApplied: pricing.coinDiscountApplied,
+            couponCode: pricing.couponCode,
+            couponDiscount: pricing.couponDiscount,
+            referralCode: referralCode || null,
+            finalAmountPaid: pricing.finalAmountPaid,
+            status: 'pending',
+        });
+
+        return res.status(200).json({
+            success: true,
+            orderId: mockOrderId,
+            paymentSessionId: 'mock_session',
+            cashfreeMode: 'mock',
+            finalPrice: pricing.finalAmountPaid,
+            coinDiscount: pricing.coinDiscountApplied,
+            couponDiscount: pricing.couponDiscount,
+            isMock: true,
+        });
+    }
+
     const orderId = generateOrderId(req.user.id);
     const clientUrl = getClientUrl();
     const serverUrl = getServerUrl();
@@ -116,6 +149,9 @@ export const createOrder = asyncHandler(async (req, res, next) => {
 // @access    Private
 export const confirmPayment = asyncHandler(async (req, res, next) => {
     const orderId = req.body.orderId || req.body.paymentIntentId;
+    console.log("ALLOW_MOCK_PAYMENTS:", process.env.ALLOW_MOCK_PAYMENTS);
+    console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("orderId:", orderId);
 
     if (!orderId) {
         return next(new AppError('Order ID is required', 400));
@@ -127,6 +163,7 @@ export const confirmPayment = asyncHandler(async (req, res, next) => {
         process.env.NODE_ENV !== 'production' &&
         String(orderId).startsWith('mock_')
     ) {
+        console.log("✅ Entered MOCK payment flow");
         const existingPurchase = await Purchase.findOne({ paymentId: orderId });
         if (existingPurchase) {
             return res.status(200).json({
@@ -152,30 +189,22 @@ export const confirmPayment = asyncHandler(async (req, res, next) => {
     return next(new AppError("Pricing calculation failed", 500));
 }
 
-        const purchase = await Purchase.create({
+        const { purchase : mockPurchase, alreadyProcessed : mockAlreadyProcessed, serviceId: mockServiceId,planName: mockPlanName } = await fulfillPurchaseFromOrder({
+            orderId,
             userId: req.user.id,
-            planId: pricing.plan._id,
-            planName: pricing.plan.name,
-            planPrice: pricing.planPrice,
-            paymentId: orderId,
-            paymentStatus: 'Completed',
-            formUnlocked: true,
-            referralCoinsUsed: pricing.referralCoinsUsed,
-            cashbackCoinsUsed: pricing.cashbackCoinsUsed,
-            coinDiscountApplied: pricing.coinDiscountApplied,
-            finalAmountPaid: pricing.finalAmountPaid,
-            couponDiscount: pricing.couponDiscount,
-            couponCode: pricing.couponCode,
-            originalPrice: pricing.planPrice,
         });
-
-        await User.findByIdAndUpdate(req.user.id, { $push: { purchasedPlans: purchase._id } });
 
         return res.status(200).json({
-            success: true,
-            message: 'MOCK Payment confirmed successfully',
-            purchaseId: purchase._id,
-        });
+    success: true,
+    message: mockAlreadyProcessed
+        ? 'Mock Payment already processed'
+        : 'Mock Payment confirmed successfully',
+    purchaseId: mockPurchase._id,
+    transactionId: orderId,
+    serviceId:mockServiceId,
+    planName:mockPlanName,
+    paymentStatus: 'PAID',
+});
     }
 
     const pending = await PendingPayment.findOne({ orderId, userId: req.user.id });
@@ -184,6 +213,7 @@ export const confirmPayment = asyncHandler(async (req, res, next) => {
     }
 
     try {
+        console.log("❌ Entered REAL payment flow");
         const { purchase, alreadyProcessed, serviceId, planName } = await fulfillPurchaseFromOrder({
             orderId,
             userId: req.user.id,
