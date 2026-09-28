@@ -1,11 +1,22 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Receipt, Shield, CheckCircle, FileText } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../frontend/Navbar';
 
 const GSTRegistration = () => {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
+      <Helmet>
+        <title>GST Registration Online India | GST Number | LedgerLine</title>
+        <meta name="description" content="Get your GST registration (GSTIN) online in India. Expert assistance for new GST registration, amendments and cancellation. Fast approval, fully online process." />
+        <meta name="keywords" content="GST registration, GST registration online, GST number, GSTIN registration, GST consultant, GST registration services, GST filing services, GST return filing online, new GST registration India" />
+        <meta property="og:title" content="GST Registration Online India | LedgerLine" />
+        <meta property="og:description" content="Get your GSTIN online — fast, expert-assisted GST registration across India." />
+        <meta property="og:url" content="https://powerfiling.com/services/gst-registration" />
+        <link rel="canonical" href="https://powerfiling.com/services/gst-registration" />
+      </Helmet>
+      <div className="min-h-screen bg-slate-50">
       <Navbar />
       
       <div className="py-12">
@@ -125,6 +136,7 @@ const GSTRegistration = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

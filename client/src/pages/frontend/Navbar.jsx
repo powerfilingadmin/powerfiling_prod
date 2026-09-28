@@ -16,10 +16,16 @@ import {
   LogOut,
   LayoutDashboard,
   BookOpen,
-  icons,
   FileBadge,
   PenLine,
   Rocket,
+  TrendingUp,
+  Home,
+  Car,
+  Wallet,
+  Scale,
+  Briefcase,
+  Percent,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -136,15 +142,36 @@ const Navbar = () => {
       ],
     },
     {
+      title: "Calculators",
+      icon: <Calculator size={16} />,
+      hubPath: "/calculators",
+      sections: [
+        {
+          title: "Tax Calculators",
+          items: [
+            { name: "Income Tax", icon: <Calculator size={14} />, path: "/calculators/income-tax" },
+            { name: "Old vs New Regime", icon: <Scale size={14} />, path: "/calculators/old-new-regime" },
+            { name: "Salary Tax", icon: <Briefcase size={14} />, path: "/calculators/salary-tax" },
+            { name: "Capital Gains Tax", icon: <TrendingUp size={14} />, path: "/calculators/capital-gain-tax" },
+            { name: "HRA Calculator", icon: <Percent size={14} />, path: "/calculators/hra-calculator" },
+            { name: "TDS Calculator", icon: <Receipt size={14} />, path: "/calculators/tds-calculator" },
+          ],
+        },
+        {
+          title: "Loan Calculators",
+          items: [
+            { name: "Home Loan EMI", icon: <Home size={14} />, path: "/calculators/home-loan-emi" },
+            { name: "Car Loan EMI", icon: <Car size={14} />, path: "/calculators/car-loan-emi" },
+            { name: "Personal Loan EMI", icon: <Wallet size={14} />, path: "/calculators/personal-loan-emi" },
+          ],
+        },
+      ],
+    },
+    {
       title: "Blog",
       icon: <BookOpen size={16} />,
       path: "/blog",
     },
-    // {
-    //   title: "Calculators",
-    //   icon: <Calculator size={16} />,
-    //   path: "/calculators",
-    // },
     {
       title: "Contact Us",
       icon: <CreditCard size={14} />,
@@ -210,9 +237,9 @@ const Navbar = () => {
                       onMouseLeave={() => setActiveDropdown(null)}
                     >
                       <div className="p-5">
-                        <div className="space-y-6">
+                        <div className={`${item.sections.length > 1 ? "flex gap-6" : "space-y-6"}`}>
                           {item.sections.map((section, sectionIndex) => (
-                            <div key={sectionIndex}>
+                            <div key={sectionIndex} className={item.sections.length > 1 ? "min-w-[180px]" : ""}>
                               <h4 className="text-sm font-semibold text-slate-600 mb-3 flex items-center gap-2 uppercase tracking-wide">
                                 {section.icon}
                                 {section.title}
@@ -236,6 +263,17 @@ const Navbar = () => {
                             </div>
                           ))}
                         </div>
+                        {item.hubPath && (
+                          <div className="mt-4 pt-3 border-t border-slate-100">
+                            <Link
+                              to={item.hubPath}
+                              className="flex items-center justify-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                              <Calculator size={14} />
+                              View all calculators
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </>
@@ -250,6 +288,14 @@ const Navbar = () => {
             >
               Plans
             </Link> */}
+
+            {/* Start Filing CTA */}
+            <Link
+              to="/itr-filing"
+              className="border-2 border-blue-600 text-blue-600 px-5 py-2 rounded-full font-semibold hover:bg-blue-50 transition-all duration-200 text-sm whitespace-nowrap"
+            >
+              Start Filing
+            </Link>
 
             {/* Auth Buttons */}
             {!isLoggedIn ? (
@@ -406,6 +452,16 @@ const Navbar = () => {
                           </div>
                         </div>
                       ))}
+                      {item.hubPath && (
+                        <Link
+                          to={item.hubPath}
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex items-center gap-2 p-2.5 text-sm font-semibold text-blue-600 hover:bg-blue-50 rounded-lg transition-colors ml-2"
+                        >
+                          <Calculator size={14} />
+                          View all calculators
+                        </Link>
+                      )}
                     </div>
                   )}
                 </>
@@ -416,6 +472,13 @@ const Navbar = () => {
 
         {/* Drawer Footer — Auth */}
         <div className="px-4 py-4 border-t border-slate-100">
+          <Link
+            to="/itr-filing"
+            onClick={() => setIsMenuOpen(false)}
+            className="block w-full p-3 mb-3 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-colors text-center text-sm"
+          >
+            Start Filing
+          </Link>
           {!isLoggedIn ? (
             <Link
               to="/login"

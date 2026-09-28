@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Briefcase, ArrowRight, CheckCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../frontend/Navbar';
 import Footer from '../../frontend/Footer';
 import { businessServices } from '../../../data/servicesData';
@@ -31,7 +32,17 @@ const BusinessITR = () => {
   }, [isLoggedIn]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <>
+      <Helmet>
+        <title>Business ITR Filing Services | F&O, GST & Company Tax | LedgerLine</title>
+        <meta name="description" content="File business income tax returns online — F&O trading, partnership firms, LLPs, capital gains, NRI business income and more. Expert CA-assisted ITR filing." />
+        <meta name="keywords" content="business ITR filing, F&O tax filing, F&O ITR filing, F&O income tax, F&O tax calculation, futures and options tax filing, F&O tax return filing, tax on F&O trading, NRI ITR filing, NRI tax filing, income tax return filing online" />
+        <meta property="og:title" content="Business ITR Filing Services | LedgerLine" />
+        <meta property="og:description" content="Expert business ITR filing — F&O, firms, capital gains and NRI income. Online, CA-assisted." />
+        <meta property="og:url" content="https://powerfiling.com/services/business-itr" />
+        <link rel="canonical" href="https://powerfiling.com/services/business-itr" />
+      </Helmet>
+      <div className="flex flex-col min-h-screen bg-slate-50">
       <Navbar />
 
       <main className="flex-1 py-6">
@@ -132,6 +143,7 @@ const BusinessITR = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 

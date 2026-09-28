@@ -45,11 +45,15 @@ import Footer from '../pages/frontend/Footer';
 import WithdrawalPanel from '../pages/admin/WithdrawalPanel';
 import ReferralDashboard from '../pages/ReferralDashboard/ReferralDashboard';
 import TermsAndConditions from '../pages/frontend/Terms&Condition';
+import SelfFilingPage from '../pages/SelfFilingPage';
+import ITRFilingForm from '../pages/ITRFilingForm';
 
 export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/itr-filing" element={<SelfFilingPage />} />
+      <Route path="/itr-filing/form" element={<ITRFilingForm />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/login" element={<Login />} />
       <Route path="/privacy-policy" element={<Privacypolicy />} />

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 
@@ -21,6 +22,15 @@ const HomeLoanEMICalculator = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Home Loan EMI Calculator | Monthly EMI & Interest | LedgerLine</title>
+        <meta name="description" content="Calculate your home loan EMI, total interest payable and payment breakdown instantly. Adjust loan amount, interest rate and tenure. Covers Section 24 & 80C tax benefits." />
+        <meta name="keywords" content="home loan EMI calculator, home loan calculator, housing loan EMI, mortgage calculator India, home loan interest calculator, ITR filing, income tax return filing, home loan tax benefit Section 24, home loan deduction 80C" />
+        <meta property="og:title" content="Home Loan EMI Calculator | LedgerLine" />
+        <meta property="og:description" content="Calculate monthly EMI, total interest and payment breakdown for your home loan instantly." />
+        <meta property="og:url" content="https://powerfiling.com/calculators/home-loan-emi" />
+        <link rel="canonical" href="https://powerfiling.com/calculators/home-loan-emi" />
+      </Helmet>
       <Navbar />
 
       <main className="bg-slate-50 min-h-screen">

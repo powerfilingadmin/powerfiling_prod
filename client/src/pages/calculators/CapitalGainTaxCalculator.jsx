@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 
@@ -123,6 +124,15 @@ export default function CapitalGainTaxCalculator() {
 
   return (
     <>
+      <Helmet>
+        <title>Capital Gains Tax Calculator FY 2025-26 | STCG & LTCG | LedgerLine</title>
+        <meta name="description" content="Calculate short-term and long-term capital gains tax on equity, mutual funds, property and gold for FY 2025-26. Updated with Budget 2024 rates — STCG 20%, LTCG 12.5%." />
+        <meta name="keywords" content="capital gains tax calculator, capital gains tax India, capital gains tax filing, capital gain tax calculation, LTCG calculator, STCG calculator, capital gains ITR filing, tax on capital gains, capital gains return filing, capital gains tax filing online" />
+        <meta property="og:title" content="Capital Gains Tax Calculator FY 2025-26 | LedgerLine" />
+        <meta property="og:description" content="Calculate STCG & LTCG tax on equity, property, gold and mutual funds. Budget 2024 rates." />
+        <meta property="og:url" content="https://powerfiling.com/calculators/capital-gain-tax" />
+        <link rel="canonical" href="https://powerfiling.com/calculators/capital-gain-tax" />
+      </Helmet>
       <Navbar />
       <main className="bg-white min-h-screen">
         {/* Header */}

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 
@@ -76,6 +77,15 @@ export default function HRACalculator() {
 
   return (
     <>
+      <Helmet>
+        <title>HRA Exemption Calculator FY 2025-26 | Section 10(13A) | LedgerLine</title>
+        <meta name="description" content="Calculate your HRA (House Rent Allowance) exemption under Section 10(13A) for FY 2025-26. Find the minimum of 3 conditions instantly. Old regime only." />
+        <meta name="keywords" content="HRA calculator, HRA exemption calculator, house rent allowance exemption, Section 10(13A), HRA exemption old regime, ITR filing, income tax return filing, income tax filing online, salary tax deductions India" />
+        <meta property="og:title" content="HRA Exemption Calculator FY 2025-26 | LedgerLine" />
+        <meta property="og:description" content="Calculate your HRA exemption under Section 10(13A). Old regime only. Instant result." />
+        <meta property="og:url" content="https://powerfiling.com/calculators/hra" />
+        <link rel="canonical" href="https://powerfiling.com/calculators/hra" />
+      </Helmet>
       <Navbar />
       <main className="bg-white min-h-screen">
         {/* Header */}

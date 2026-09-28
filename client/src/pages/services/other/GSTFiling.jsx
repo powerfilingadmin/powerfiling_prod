@@ -1,10 +1,21 @@
 import React from 'react';
 import { Receipt, FileText } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../frontend/Navbar';
 
 const GSTFiling = () => {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
+      <Helmet>
+        <title>GST Filing Services Online | GST Return Filing | LedgerLine</title>
+        <meta name="description" content="File your GST returns online with expert assistance. GSTR-1, GSTR-3B, GSTR-9 filing services for businesses across India. Fast, accurate and fully online." />
+        <meta name="keywords" content="GST filing services, GST return filing, GST filing online, GST return filing online, GST tax filing, GST filing consultant, GST return filing services, GSTR-1, GSTR-3B filing India" />
+        <meta property="og:title" content="GST Filing Services Online | LedgerLine" />
+        <meta property="og:description" content="Expert GST return filing — GSTR-1, GSTR-3B, GSTR-9 — online, fast and affordable." />
+        <meta property="og:url" content="https://powerfiling.com/services/gst-filing" />
+        <link rel="canonical" href="https://powerfiling.com/services/gst-filing" />
+      </Helmet>
+      <div className="min-h-screen bg-slate-50">
       <Navbar />
       
       <div className="py-20">
@@ -63,6 +74,7 @@ const GSTFiling = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { User, ArrowRight, CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../../frontend/Navbar";
 import Footer from "../../frontend/Footer";
 import { individualServices } from "../../../data/servicesData";
@@ -31,7 +32,17 @@ const IndividualITR = () => {
   }, [isLoggedIn]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <>
+      <Helmet>
+        <title>Individual ITR Filing Services | Salary & Capital Gains | LedgerLine</title>
+        <meta name="description" content="File your individual income tax return (ITR) online with expert assistance. Covers salary, capital gains, NRI income, F&O trading, rental income and more. Fast, accurate, affordable." />
+        <meta name="keywords" content="ITR filing, ITR filing online, income tax return filing, income tax filing online, file ITR online, ITR filing services, ITR filing consultant, income tax return filing online, NRI ITR filing, capital gains ITR filing, F&O ITR filing" />
+        <meta property="og:title" content="Individual ITR Filing Services | LedgerLine" />
+        <meta property="og:description" content="Expert individual ITR filing — salary, capital gains, NRI, F&O and more. Online, fast and affordable." />
+        <meta property="og:url" content="https://powerfiling.com/services/individual-itr" />
+        <link rel="canonical" href="https://powerfiling.com/services/individual-itr" />
+      </Helmet>
+      <div className="flex flex-col min-h-screen bg-slate-50">
       <Navbar />
 
       <main className="flex-1 py-6">
@@ -144,6 +155,7 @@ const IndividualITR = () => {
 
       <Footer />
     </div>
+    </>
   );
 };
 

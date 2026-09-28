@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 
@@ -128,6 +129,15 @@ export default function SalaryTaxCalculator() {
 
   return (
     <>
+      <Helmet>
+        <title>Salary Tax Calculator FY 2025-26 | In-Hand Salary | LedgerLine</title>
+        <meta name="description" content="Calculate income tax on your salary for FY 2025-26. Enter basic, HRA, allowances and deductions to get your exact tax liability and monthly in-hand salary under old and new regime." />
+        <meta name="keywords" content="salary tax calculator, salary income tax calculator, in-hand salary calculator, ITR filing, income tax return filing, income tax filing online, new regime salary tax, old regime deductions, 80C 80D HRA tax saving, tax on salary India FY 2025-26" />
+        <meta property="og:title" content="Salary Tax Calculator FY 2025-26 | LedgerLine" />
+        <meta property="og:description" content="Calculate your exact salary tax and monthly in-hand amount under old and new regime for FY 2025-26." />
+        <meta property="og:url" content="https://powerfiling.com/calculators/salary-tax" />
+        <link rel="canonical" href="https://powerfiling.com/calculators/salary-tax" />
+      </Helmet>
       <Navbar />
       <main className="bg-white min-h-screen">
         {/* Header */}

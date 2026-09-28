@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 
@@ -124,6 +125,15 @@ export default function OldVsNewRegimeCalculator() {
 
   return (
     <>
+      <Helmet>
+        <title>Old vs New Regime Calculator FY 2025-26 | Tax Comparison | LedgerLine</title>
+        <meta name="description" content="Compare old vs new tax regime for FY 2025-26. See which regime saves you more tax, breakeven income point, and updated Budget 2025 slab rates side by side." />
+        <meta name="keywords" content="old vs new regime calculator, old regime new regime comparison, income tax regime comparison, new tax regime FY 2025-26, old tax regime deductions, ITR filing, income tax return filing, income tax filing online, which regime is better, tax savings India" />
+        <meta property="og:title" content="Old vs New Tax Regime Calculator FY 2025-26 | LedgerLine" />
+        <meta property="og:description" content="Compare old and new tax regime side by side. Find which saves you more for FY 2025-26." />
+        <meta property="og:url" content="https://powerfiling.com/calculators/old-vs-new-regime" />
+        <link rel="canonical" href="https://powerfiling.com/calculators/old-vs-new-regime" />
+      </Helmet>
       <Navbar />
       <main className="bg-white min-h-screen">
         {/* Header */}

@@ -1,10 +1,21 @@
 import React from 'react';
 import { Building, FileText } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../frontend/Navbar';
 
 const CompanyRegistration = () => {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
+      <Helmet>
+        <title>Company Registration Online India | Private Limited | LedgerLine</title>
+        <meta name="description" content="Register your private limited company, LLP or OPC online in India. Fast, affordable company registration services with expert guidance on MCA filing and incorporation." />
+        <meta name="keywords" content="company registration, company registration online, private limited company registration, company registration in India, online company registration, private limited company registration online, company registration services, company registration consultant, company incorporation India" />
+        <meta property="og:title" content="Company Registration Online India | LedgerLine" />
+        <meta property="og:description" content="Register your private limited company online in India — fast, affordable, fully guided." />
+        <meta property="og:url" content="https://powerfiling.com/services/company-registration" />
+        <link rel="canonical" href="https://powerfiling.com/services/company-registration" />
+      </Helmet>
+      <div className="min-h-screen bg-slate-50">
       <Navbar />
       
       <div className="py-20">
@@ -63,6 +74,7 @@ const CompanyRegistration = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

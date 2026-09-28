@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Info, Share2 } from "lucide-react";
+import { ArrowLeft, Info, Share2, Check } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 
@@ -147,6 +148,27 @@ const TABS = ["Basic details", "Income details", "Deduction"];
 
 const IncomeTaxCalculator = () => {
   const [tab, setTab] = useState(0);
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    const shareData = {
+      title: "Income Tax Calculator – FY 2025-26 | LedgerLine",
+      text: "Calculate your income tax under Old & New Regime for FY 2025-26. Free online calculator.",
+      url,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (_) { /* user cancelled */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (_) {
+        prompt("Copy this link:", url);
+      }
+    }
+  };
 
   // Basic details
   const [ageGroup, setAgeGroup] = useState("below60"); // below60 | 60to80 | above80
@@ -200,6 +222,15 @@ const IncomeTaxCalculator = () => {
 
   return (
     <>
+      <Helmet>
+        <title>Income Tax Calculator FY 2025-26 | Old vs New Regime | LedgerLine</title>
+        <meta name="description" content="Free online income tax calculator for FY 2025-26. Compare old vs new regime, calculate tax liability, 87A rebate, and standard deduction instantly." />
+        <meta name="keywords" content="income tax calculator, ITR filing, income tax return filing, income tax filing online, file ITR online, ITR filing services, income tax return filing online, tax calculation FY 2025-26, old regime new regime calculator, salary tax calculator India" />
+        <meta property="og:title" content="Income Tax Calculator FY 2025-26 | LedgerLine" />
+        <meta property="og:description" content="Calculate your income tax under Old & New Regime for FY 2025-26. Free, instant, accurate." />
+        <meta property="og:url" content="https://powerfiling.com/calculators/income-tax" />
+        <link rel="canonical" href="https://powerfiling.com/calculators/income-tax" />
+      </Helmet>
       <Navbar />
 
       <main className="bg-white min-h-screen">
@@ -225,9 +256,9 @@ const IncomeTaxCalculator = () => {
                   </span>
                 </div>
               </div>
-              <button className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-600 border border-slate-200 rounded-lg px-3 py-1.5 transition-colors">
-                <Share2 size={13} />
-                SHARE
+              <button className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-600 border border-slate-200 rounded-lg px-3 py-1.5 transition-colors" onClick={handleShare}>
+                {copied ? <Check size={13} className="text-green-500" /> : <Share2 size={13} />}
+                {copied ? "COPIED!" : "SHARE"}
               </button>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Info } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 
@@ -320,6 +321,15 @@ export default function TDSCalculator() {
 
   return (
     <>
+      <Helmet>
+        <title>TDS Calculator FY 2025-26 | All Sections & Rates | LedgerLine</title>
+        <meta name="description" content="Calculate TDS for FY 2025-26 across all sections — 194A, 194C, 194I, 194J, 194IB, 194T and more. Updated with Budget 2025 threshold and rate changes." />
+        <meta name="keywords" content="TDS calculator, TDS rates FY 2025-26, tax deducted at source, TDS on salary, TDS on rent, TDS on interest, TDS on professional fees, ITR filing, income tax return filing online, TDS refund filing" />
+        <meta property="og:title" content="TDS Calculator FY 2025-26 | LedgerLine" />
+        <meta property="og:description" content="Calculate TDS across all sections with Budget 2025 updated rates and thresholds." />
+        <meta property="og:url" content="https://powerfiling.com/calculators/tds" />
+        <link rel="canonical" href="https://powerfiling.com/calculators/tds" />
+      </Helmet>
       <Navbar />
       <main className="bg-white min-h-screen">
         {/* Header */}

@@ -1,10 +1,21 @@
 import React from 'react';
 import { CreditCard, FileText } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../frontend/Navbar';
 
 const TDSFiling = () => {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <>
+      <Helmet>
+        <title>TDS Filing Services Online | TDS Return Filing | LedgerLine</title>
+        <meta name="description" content="File TDS returns online — Form 24Q, 26Q, 27Q and 27EQ. Expert TDS filing services for businesses, individuals and employers. Avoid notices with timely filing." />
+        <meta name="keywords" content="TDS filing, TDS return filing, TDS filing online, TDS return filing online, TDS filing services, income tax TDS, ITR filing, TDS on salary, TDS refund, Form 26Q filing India" />
+        <meta property="og:title" content="TDS Filing Services Online | LedgerLine" />
+        <meta property="og:description" content="Expert TDS return filing — Form 24Q, 26Q, 27Q — online, fast and penalty-free." />
+        <meta property="og:url" content="https://powerfiling.com/services/tds-filing" />
+        <link rel="canonical" href="https://powerfiling.com/services/tds-filing" />
+      </Helmet>
+      <div className="min-h-screen bg-slate-50">
       <Navbar />
       
       <div className="py-20">
@@ -63,6 +74,7 @@ const TDSFiling = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 
