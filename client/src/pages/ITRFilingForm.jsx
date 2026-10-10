@@ -1033,7 +1033,7 @@ const ITRFilingForm = () => {
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState({});
   const [showResidentialModal, setShowResidentialModal] = useState(false);
-  const [showTestBanner, setShowTestBanner] = useState(import.meta.env.DEV);
+  const [showTestBanner, setShowTestBanner] = useState(true);
 
   /* ── Personal Info state ── */
   const [personal, setPersonal] = useState({
