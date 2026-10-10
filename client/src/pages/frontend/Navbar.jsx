@@ -289,6 +289,14 @@ const Navbar = () => {
               Plans
             </Link> */}
 
+            {/* Start Filing CTA */}
+            <Link
+              to="/itr-filing"
+              className="border-2 border-blue-600 text-blue-600 px-5 py-2 rounded-full font-semibold hover:bg-blue-50 transition-all duration-200 text-sm whitespace-nowrap"
+            >
+              Start Filing
+            </Link>
+
             {/* Auth Buttons */}
             {!isLoggedIn ? (
               <Link
@@ -464,6 +472,13 @@ const Navbar = () => {
 
         {/* Drawer Footer — Auth */}
         <div className="px-4 py-4 border-t border-slate-100">
+          <Link
+            to="/itr-filing"
+            onClick={() => setIsMenuOpen(false)}
+            className="block w-full p-3 mb-3 border-2 border-blue-600 text-blue-600 rounded-xl font-semibold hover:bg-blue-50 transition-colors text-center text-sm"
+          >
+            Start Filing
+          </Link>
           {!isLoggedIn ? (
             <Link
               to="/login"

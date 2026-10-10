@@ -25,7 +25,8 @@ export const connectDB = async () => {
                 console.log(process.env.MONGO_URI ? 'MONGO_URI is set' : 'MONGO_URI is NOT set');
                 const noCreds = uri.replace(/\/\/.*?@/, '//');
                 const host = noCreds.split('/')[2];
-                console.log(`Mongo target host: ${host}`);
+                console.log(host.includes('uvcdzhq') ? 'ON STAGING DB' : `${host.includes('cioyswh') ? 'ON PROD DB' : 'UNKNOWN DB'}`);
+                console.log(`Mongo current target host: ${host}`);
             } catch (e) {
                 console.log('Mongo target host: (unavailable)');
             }

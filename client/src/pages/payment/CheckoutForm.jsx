@@ -57,7 +57,7 @@ export default function CheckoutForm({ serviceId, planId, planName, amount: plan
             setCouponMsg({ text: data.message, type: 'success' });
         }
     } catch (err) {
-        setCouponMsg({ text: err.response?.data?.error || 'Invalid coupon code', type: 'error' });
+        setCouponMsg({ text: err.response?.data?.error || err.response.data.message, type: 'error' });
     } finally {
         setCouponValidating(false);
     }
@@ -160,6 +160,48 @@ export default function CheckoutForm({ serviceId, planId, planName, amount: plan
                 referralCoinsUsed: referralCoinsToUse,
                 cashbackCoinsUsed: cashbackCoinsToUse,
             });
+
+             if (orderData.isMock) {
+            // Skip Cashfree SDK entirely — go straight to confirm
+            console.log('Mock payment mode enabled. Skipping Cashfree SDK.',orderData);
+            const confirmRes = await api.post('/payments/confirm', {
+                orderId: orderData.orderId,
+                planId,
+            })    
+            console.log("confirmRes =", confirmRes);
+            console.log("confirmRes.data =", confirmRes.data);
+            console.log("confirmRes.data.success =", confirmRes.data?.success);
+                    if (confirmRes.data.success) {
+                clearReferralCode();
+                console.log("➡️ Navigating with state:", {
+    transactionId: orderData.orderId,
+    purchaseId: confirmRes.data.purchaseId,
+    serviceId: confirmRes.data.serviceId,
+    planName: confirmRes.data.planName,
+});
+                navigate('/payment-success', {
+                    replace: true,
+                    state: {
+                        transactionId: orderData?.orderId,
+                        serviceId: confirmRes?.data?.serviceId || serviceId,
+                        purchaseId: confirmRes?.data?.purchaseId,
+                        planName: confirmRes?.data?.planName || planName,
+                    },
+                });
+            } else {
+                navigate('/payment-failed', {
+                    replace: true,
+                    state: {
+                        errorMessage: 'Payment could not be confirmed. Please try again.',
+                        transactionId: orderData.orderId,
+                        planName,
+                        serviceId,
+                    },
+                });
+            }
+            return;
+        
+        }
 
             if (!orderData.success || !orderData.paymentSessionId) {
                 throw new Error('Failed to initialize payment');

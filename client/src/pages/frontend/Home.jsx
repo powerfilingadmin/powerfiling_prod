@@ -17,12 +17,18 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { Link } from "react-router-dom";
 import plansConfig from "../../data/plansConfig.json";
+import { individualServices } from "../../data/servicesData";
 
 const Home = () => {
 
   const [selectedIncome, setSelectedIncome] = useState([]);
   const [suggestedITR, setSuggestedITR] = useState(null);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  const basicPrice = individualServices.find(s => s.id === 'salary-basic-itr')?.price || '₹599';
+  const premiumPrice = individualServices.find(s => s.id === 'salary-premium')?.price || '₹999';
+  const capitalPrice = individualServices.find(s => s.id === 'capital-gain')?.price || '₹1,499';
+  const nriPrice = individualServices.find(s => s.id === 'nri-income')?.price || '₹1,999';
 
   const incomeTypes = [
     { id: "salary", label: "Salary/Pension" },
@@ -252,7 +258,7 @@ const Home = () => {
                       You should file {suggestedITR}
                     </p>
                     <p className="text-blue-700 text-lg">
-                      Our plans start from just <span className="font-bold">₹499</span> for this category.
+                      Our plans start from just <span className="font-bold">{basicPrice}</span> for this category.
                     </p>
                   </div>
                 </div>
