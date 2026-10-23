@@ -777,6 +777,435 @@ const QC_DEFAULTS = {
   ltcgEquity: "",
 };
 
+/* ══════════════════════════════════════════
+   HOUSE PROPERTY SECTION
+══════════════════════════════════════════ */
+let nextPropId = 0;
+const newSelfOccupied = () => ({
+  id: ++nextPropId, type: "so",
+  // address
+  sameAsPersonal: false, flatDoorNo: "", premiseName: "", roadStreet: "",
+  areaLocality: "", pincode: "", state: "", city: "", country: "INDIA",
+  // owner
+  ownerName: "", ownerPAN: "", ownerShare: "100",
+  hasCoOwner: false,
+  coOwners: [{ name: "", pan: "", share: "" }],
+  // loan
+  loans: [],
+  homeLoanDeduction: "0", // derived, shown read-only
+});
+
+const newLetOut = () => ({
+  id: ++nextPropId, type: "lo",
+  sameAsPersonal: false, flatDoorNo: "", premiseName: "", roadStreet: "",
+  areaLocality: "", pincode: "", state: "", city: "", country: "INDIA",
+  ownerName: "", ownerPAN: "", ownerShare: "100",
+  hasCoOwner: false,
+  coOwners: [{ name: "", pan: "", share: "" }],
+  // tenant
+  tenants: [{ name: "", panTan: "", aadhaar: "" }],
+  // rental income
+  rentReceived: "", municipalTax: "",
+  // loan
+  loans: [],
+  homeLoanDeduction: "0",
+});
+
+let nextLoanId = 0;
+const newLoan = () => ({
+  id: ++nextLoanId,
+  loanFrom: "Bank", bankName: "", accountNo: "",
+  sanctionDate: "", loanAmount: "", loanOutstanding: "",
+  preConstructionInterest: "", postConstructionInterest: "",
+});
+
+const HousePropertySection = ({ income, setIncome, personal }) => {
+  const soList  = income.selfOccupiedProps  || [];
+  const letList = income.letOutProps || [];
+
+  const addSO  = () => setIncome(p => ({ ...p, selfOccupiedProps:  [...(p.selfOccupiedProps  || []), newSelfOccupied()] }));
+  const addLet = () => setIncome(p => ({ ...p, letOutProps: [...(p.letOutProps || []), newLetOut()] }));
+
+  const updateSO  = (id, patch) => setIncome(p => ({ ...p, selfOccupiedProps:  p.selfOccupiedProps.map( prop => prop.id === id ? { ...prop, ...patch } : prop) }));
+  const updateLet = (id, patch) => setIncome(p => ({ ...p, letOutProps: p.letOutProps.map(prop => prop.id === id ? { ...prop, ...patch } : prop) }));
+  const removeSO  = (id) => setIncome(p => ({ ...p, selfOccupiedProps:  p.selfOccupiedProps.filter( prop => prop.id !== id) }));
+  const removeLet = (id) => setIncome(p => ({ ...p, letOutProps: p.letOutProps.filter(prop => prop.id !== id) }));
+
+  return (
+    <div className="space-y-3 mt-2">
+      {/* Self Occupied */}
+      <div className="border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">🏠</div>
+            <div>
+              <p className="text-sm font-bold text-slate-800">Self Occupied Properties <span className="text-slate-400 font-normal">(not given on rent)</span></p>
+              <p className="text-xs text-slate-500">Add address, loan interest, owner details etc.</p>
+            </div>
+          </div>
+          <button type="button" onClick={addSO} className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">
+            + Add Details
+          </button>
+        </div>
+        {soList.map((prop) => (
+          <PropCard key={prop.id} prop={prop} type="so" onUpdate={p => updateSO(prop.id, p)} onRemove={() => removeSO(prop.id)} personal={personal} />
+        ))}
+      </div>
+
+      {/* Let Out */}
+      <div className="border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">🏘️</div>
+            <div>
+              <p className="text-sm font-bold text-slate-800">Properties given on Rent</p>
+              <p className="text-xs text-slate-500">Add rent, address, loan interest, tenant details etc.</p>
+            </div>
+          </div>
+          <button type="button" onClick={addLet} className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">
+            + Add Details
+          </button>
+        </div>
+        {letList.map((prop) => (
+          <PropCard key={prop.id} prop={prop} type="lo" onUpdate={p => updateLet(prop.id, p)} onRemove={() => removeLet(prop.id)} personal={personal} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* Single property card (self-occupied or let-out) */
+const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
+  const [open, setOpen] = useState(true);
+  const [showLoanModal, setShowLoanModal] = useState(false);
+
+  const isLetOut = type === "lo";
+
+  // auto-fill address from personal info
+  const fillFromPersonal = (checked) => {
+    if (checked) {
+      onUpdate({
+        sameAsPersonal: true,
+        flatDoorNo: personal.flatDoorNo, premiseName: personal.premiseName,
+        roadStreet: personal.roadStreet, areaLocality: personal.areaLocality,
+        pincode: personal.pincode, state: personal.state,
+        city: personal.city, country: personal.country,
+      });
+    } else {
+      onUpdate({ sameAsPersonal: false });
+    }
+  };
+
+  const addCoOwner = () => onUpdate({ coOwners: [...prop.coOwners, { name: "", pan: "", share: "" }] });
+  const removeCoOwner = (i) => onUpdate({ coOwners: prop.coOwners.filter((_, idx) => idx !== i) });
+  const updateCoOwner = (i, field, val) => onUpdate({ coOwners: prop.coOwners.map((c, idx) => idx === i ? { ...c, [field]: val } : c) });
+
+  const addTenant = () => onUpdate({ tenants: [...(prop.tenants || []), { name: "", panTan: "", aadhaar: "" }] });
+  const removeTenant = (i) => onUpdate({ tenants: prop.tenants.filter((_, idx) => idx !== i) });
+  const updateTenant = (i, field, val) => onUpdate({ tenants: prop.tenants.map((t, idx) => idx === i ? { ...t, [field]: val } : t) });
+
+  // Rental income auto-calc
+  const rent    = toNum(prop.rentReceived);
+  const muni    = toNum(prop.municipalTax);
+  const stdDed  = Math.round((rent - muni) * 0.30);
+  const loanDed = toNum(prop.homeLoanDeduction);
+  const netIncome = rent - muni - stdDed - loanDed;
+
+  return (
+    <div className="border-t border-slate-100">
+      <div className="flex items-center justify-between px-4 py-3 bg-white">
+        <span className="text-sm font-semibold text-slate-700">{prop.flatDoorNo || (isLetOut ? "Let-out Property" : "Self-occupied Property")}</span>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setOpen(o => !o)} className="text-slate-400 hover:text-slate-600">
+            {open ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+          </button>
+          <button type="button" onClick={onRemove} className="text-red-400 hover:text-red-600"><Trash2 size={14} /></button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="px-4 pb-5 space-y-5 bg-white">
+          {/* House Address */}
+          <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+            <div className="flex items-center gap-2 mb-1">
+              <MapPin size={14} className="text-rose-500" />
+              <p className="text-sm font-bold text-slate-800">House Address</p>
+            </div>
+            <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
+              <input type="checkbox" checked={prop.sameAsPersonal} onChange={e => fillFromPersonal(e.target.checked)} className="w-3.5 h-3.5 text-blue-600 rounded" />
+              Same as the address filled in Personal Information
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <FloatingInput label="Flat/Door/Block No.*" value={prop.flatDoorNo} onChange={e => onUpdate({ flatDoorNo: e.target.value })} readOnly={prop.sameAsPersonal} />
+              <FloatingInput label="Premise Name" value={prop.premiseName} onChange={e => onUpdate({ premiseName: e.target.value })} readOnly={prop.sameAsPersonal} />
+            </div>
+            <FloatingInput label="Road/Street" value={prop.roadStreet} onChange={e => onUpdate({ roadStreet: e.target.value })} readOnly={prop.sameAsPersonal} />
+            <div className="grid grid-cols-2 gap-3">
+              <FloatingInput label="Area/Locality*" value={prop.areaLocality} onChange={e => onUpdate({ areaLocality: e.target.value })} readOnly={prop.sameAsPersonal} />
+              <FloatingInput label="Pincode*" value={prop.pincode} onChange={e => onUpdate({ pincode: e.target.value })} readOnly={prop.sameAsPersonal} />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <FloatingSelect label="Country" value={prop.country} onChange={e => onUpdate({ country: e.target.value })} options={[{ value: "INDIA", label: "INDIA" }]} />
+              <FloatingSelect label="State" value={prop.state} onChange={e => onUpdate({ state: e.target.value })} options={STATE_OPTIONS} />
+              <FloatingInput label="City" value={prop.city} onChange={e => onUpdate({ city: e.target.value })} readOnly={prop.sameAsPersonal} />
+            </div>
+          </div>
+
+          {/* Owner Details */}
+          <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <span className="text-base">👤</span>
+                <p className="text-sm font-bold text-slate-800">Owner Details</p>
+              </div>
+              <span className="text-xs font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Your Share: {prop.ownerShare || 100}%</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <FloatingInput label="Name of Owner" value={prop.ownerName} onChange={e => onUpdate({ ownerName: e.target.value })} />
+              <FloatingInput label="PAN of Owner" value={prop.ownerPAN} onChange={e => onUpdate({ ownerPAN: e.target.value.toUpperCase() })} />
+              <FloatingInput label="% Share" type="number" value={prop.ownerShare} onChange={e => onUpdate({ ownerShare: e.target.value })} />
+            </div>
+            {/* Co-owner toggle */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+              <div>
+                <p className="text-sm font-semibold text-slate-800">Does the property have more than one owner?</p>
+                <p className="text-xs text-slate-500">Enter basic details of your co-owner such as Name, PAN and % share.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-semibold ${!prop.hasCoOwner ? "text-slate-800" : "text-slate-400"}`}>No</span>
+                <button type="button" onClick={() => onUpdate({ hasCoOwner: !prop.hasCoOwner })}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${prop.hasCoOwner ? "bg-blue-600" : "bg-slate-300"}`}>
+                  <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${prop.hasCoOwner ? "translate-x-5" : "translate-x-0.5"}`} />
+                </button>
+                <span className={`text-xs font-semibold ${prop.hasCoOwner ? "text-slate-800" : "text-slate-400"}`}>Yes</span>
+              </div>
+            </div>
+            {prop.hasCoOwner && (
+              <div className="space-y-2 pt-2">
+                <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 px-1">
+                  {["Name of Co-Owner", "PAN of Co-Owner", "% Share", ""].map(h => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+                </div>
+                {prop.coOwners.map((co, i) => (
+                  <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
+                    <input value={co.name} onChange={e => updateCoOwner(i, "name", e.target.value)} placeholder="Co-owner Name" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                    <input value={co.pan} onChange={e => updateCoOwner(i, "pan", e.target.value.toUpperCase())} placeholder="PAN" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                    <input type="number" value={co.share} onChange={e => updateCoOwner(i, "share", e.target.value)} placeholder="%" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                    {prop.coOwners.length > 1
+                      ? <button type="button" onClick={() => removeCoOwner(i)} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+                      : <div className="w-6" />}
+                  </div>
+                ))}
+                <button type="button" onClick={addCoOwner} className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 mt-1">
+                  <Plus size={11} className="border border-blue-600 rounded-full" /> Add more items
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Tenant Details — let-out only */}
+          {isLetOut && (
+            <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">🏢</span>
+                <p className="text-sm font-bold text-slate-800">Tenant Details</p>
+              </div>
+              <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 px-1">
+                {["Name of Tenant", "PAN/TAN of Tenant", "Aadhaar of Tenant", ""].map(h => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+              </div>
+              {(prop.tenants || []).map((t, i) => (
+                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-center">
+                  <input value={t.name} onChange={e => updateTenant(i, "name", e.target.value)} placeholder="Tenant Name" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                  <input value={t.panTan} onChange={e => updateTenant(i, "panTan", e.target.value.toUpperCase())} placeholder="PAN / TAN" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                  <input value={t.aadhaar} onChange={e => updateTenant(i, "aadhaar", e.target.value)} placeholder="Aadhaar" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                  {(prop.tenants || []).length > 1
+                    ? <button type="button" onClick={() => removeTenant(i)} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+                    : <div className="w-6" />}
+                </div>
+              ))}
+              <button type="button" onClick={addTenant} className="text-xs font-semibold text-blue-600 flex items-center gap-1 mt-1">
+                <Plus size={11} className="border border-blue-600 rounded-full" /> Add more items
+              </button>
+            </div>
+          )}
+
+          {/* Rental Income — let-out only */}
+          {isLetOut && (
+            <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">📋</span>
+                <p className="text-sm font-bold text-slate-800">1. Rental Income and Property Tax Details</p>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-slate-100">
+                <p className="text-sm text-slate-700">A. Total Annual Rent Received</p>
+                <CurrencyInput value={prop.rentReceived} onChange={e => onUpdate({ rentReceived: e.target.value })} width="w-44" />
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-slate-100">
+                <div>
+                  <p className="text-sm text-slate-700">B. Municipal / Property Tax Paid</p>
+                  <p className="text-xs text-slate-400">Specifying this reduces your tax liability</p>
+                </div>
+                <CurrencyInput value={prop.municipalTax} onChange={e => onUpdate({ municipalTax: e.target.value })} width="w-44" />
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-slate-100">
+                <div>
+                  <p className="text-sm text-slate-700">C. Standard Deduction u/s 24a <span className="text-slate-400">(30% of (A − B))</span></p>
+                  <p className="text-xs text-slate-400">This field is auto-calculated</p>
+                </div>
+                <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 w-44">
+                  <span className="text-slate-400 text-sm">₹</span>
+                  <span className="flex-1 text-sm font-semibold text-slate-600 text-right">{stdDed.toLocaleString("en-IN")}</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between py-2">
+                <div>
+                  <p className="text-sm font-semibold text-slate-800">Net Income <span className="text-slate-400 font-normal">(A − B − C − Loan)</span></p>
+                  <p className="text-xs text-slate-400">This field is auto-calculated</p>
+                </div>
+                <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 w-44">
+                  <span className="text-slate-400 text-sm">₹</span>
+                  <span className={`flex-1 text-sm font-semibold text-right ${netIncome < 0 ? "text-red-600" : "text-slate-600"}`}>{netIncome.toLocaleString("en-IN")}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Home Loan Details */}
+          <div className="border border-slate-200 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🏦</span>
+                <p className="text-sm font-bold text-slate-800">Home Loan Details</p>
+              </div>
+              <button type="button" onClick={() => setShowLoanModal(true)}
+                className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">
+                {prop.loans?.length > 0 ? "Edit Loans" : "Add Loan"}
+              </button>
+            </div>
+            {prop.loans?.length > 0 ? (
+              <div className="space-y-2">
+                {prop.loans.map((l, i) => (
+                  <div key={l.id} className="flex justify-between items-center bg-slate-50 rounded-lg px-3 py-2 text-xs">
+                    <span className="text-slate-700 font-semibold">{l.bankName || `Loan ${i + 1}`}</span>
+                    <span className="text-slate-600">Deduction: ₹{toNum(prop.homeLoanDeduction).toLocaleString("en-IN")}</span>
+                  </div>
+                ))}
+                <p className="text-xs text-slate-500 mt-1">Maximum deduction claimable in a FY is ₹2,00,000 {isLetOut ? "(uncapped for let-out)" : ""}</p>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400">No loans added yet. Click Add Loan to enter your home loan interest certificate details.</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Home Loan Modal */}
+      {showLoanModal && (
+        <HomeLoanModal prop={prop} onClose={() => setShowLoanModal(false)} onSave={(loans, deduction) => { onUpdate({ loans, homeLoanDeduction: String(deduction) }); setShowLoanModal(false); }} />
+      )}
+    </div>
+  );
+};
+
+/* Home Loan Details Modal */
+const HomeLoanModal = ({ prop, onClose, onSave }) => {
+  const [loans, setLoans] = useState(prop.loans?.length ? prop.loans : [newLoan()]);
+
+  const addLoan = () => setLoans(l => [...l, newLoan()]);
+  const removeLoan = (id) => setLoans(l => l.filter(x => x.id !== id));
+  const updateLoan = (id, patch) => setLoans(l => l.map(x => x.id === id ? { ...x, ...patch } : x));
+
+  const calcDeduction = (loan) => {
+    const pre  = toNum(loan.preConstructionInterest);
+    const post = toNum(loan.postConstructionInterest);
+    return Math.round(pre * 0.20) + post;
+  };
+
+  const totalDeduction = Math.min(loans.reduce((s, l) => s + calcDeduction(l), 0), 200_000);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-slate-100">
+          <div>
+            <h2 className="font-extrabold text-slate-900 text-base">Home Loan Details</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Enter loan details or upload the home loan interest certificate for this house property.</p>
+          </div>
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={20} /></button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+          {loans.map((loan, i) => {
+            const ded = calcDeduction(loan);
+            return (
+              <div key={loan.id} className="border border-slate-200 rounded-xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-slate-50">
+                  <p className="text-sm font-bold text-slate-800">Loan Details {i + 1}</p>
+                  {loans.length > 1 && <button type="button" onClick={() => removeLoan(loan.id)} className="text-red-400 hover:text-red-600"><Trash2 size={15} /></button>}
+                </div>
+                <div className="px-4 py-4 space-y-4">
+                  {/* Upload strip */}
+                  <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-blue-500">📄</span>
+                      <span className="text-xs text-blue-700 font-semibold">Upload your Loan Interest Certificate to fetch details instantly</span>
+                    </div>
+                    <button type="button" className="text-xs font-bold text-blue-600 border border-blue-300 rounded-lg px-3 py-1.5 hover:bg-blue-100">Upload File</button>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 mb-1 block">Loan Taken From</label>
+                      <select value={loan.loanFrom} onChange={e => updateLoan(loan.id, { loanFrom: e.target.value })}
+                        className="w-full border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 appearance-none">
+                        {["Bank","Housing Finance Co.","Employer","Others"].map(o => <option key={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <FloatingInput label="Name of Bank / Institution" value={loan.bankName} onChange={e => updateLoan(loan.id, { bankName: e.target.value })} />
+                    <FloatingInput label="Loan Account Number" value={loan.accountNo} onChange={e => updateLoan(loan.id, { accountNo: e.target.value })} />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <FloatingInput label="Date of Sanction" type="date" value={loan.sanctionDate} onChange={e => updateLoan(loan.id, { sanctionDate: e.target.value })} />
+                    <FloatingInput label="Total Loan Amount (₹)" type="number" value={loan.loanAmount} onChange={e => updateLoan(loan.id, { loanAmount: e.target.value })} />
+                    <FloatingInput label="Loan Outstanding (₹)" type="number" value={loan.loanOutstanding} onChange={e => updateLoan(loan.id, { loanOutstanding: e.target.value })} />
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <FloatingInput label="A. Interest before construction (₹)" type="number" value={loan.preConstructionInterest} onChange={e => updateLoan(loan.id, { preConstructionInterest: e.target.value })} hint="20% interest eligible for deduction" />
+                    </div>
+                    <FloatingInput label="B. Interest after construction (₹)" type="number" value={loan.postConstructionInterest} onChange={e => updateLoan(loan.id, { postConstructionInterest: e.target.value })} />
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 mb-1 block">Deduction <span className="font-normal text-slate-400">(20% of A) + B</span></label>
+                      <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-3 py-2.5 bg-slate-50">
+                        <span className="text-slate-400 text-sm">₹</span>
+                        <span className="flex-1 text-sm font-semibold text-slate-700 text-right">{ded.toLocaleString("en-IN")}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          <button type="button" onClick={addLoan} className="text-sm font-semibold text-blue-600 flex items-center gap-1 hover:text-blue-700">
+            <Plus size={13} className="border border-blue-600 rounded-full" /> Add another loan
+          </button>
+        </div>
+
+        <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-bold text-slate-800">Total Deduction: <span className="text-blue-700">₹{totalDeduction.toLocaleString("en-IN")}</span></p>
+            <p className="text-xs text-slate-400">Maximum deduction claimable in a FY is ₹2,00,000</p>
+          </div>
+          <button type="button" onClick={() => onSave(loans, totalDeduction)}
+            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition-all shadow-md">
+            Save & Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const QuickCalc = () => {
   const [open, setOpen]   = useState(false);
   const [q, setQ]         = useState(QC_DEFAULTS);
@@ -842,31 +1271,6 @@ const QuickCalc = () => {
     });
   };
 
-  const QRow = ({ l, v, bold, highlight }) => (
-    <div className={`flex justify-between items-center py-1.5 border-b border-slate-100 last:border-0 text-xs
-      ${highlight ? "bg-blue-50 -mx-3 px-3 rounded-lg mt-1" : ""}`}>
-      <span className={bold || highlight ? "font-bold text-slate-800" : "text-slate-500"}>{l}</span>
-      <span className={`font-semibold ${highlight ? "text-blue-700" : "text-slate-800"}`}>{v}</span>
-    </div>
-  );
-
-  const QInput = ({ label, fieldKey, hint }) => (
-    <div className="flex flex-col gap-0.5">
-      <label className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide">{label}</label>
-      <div className="flex items-center border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white focus-within:ring-2 focus-within:ring-blue-200 focus-within:border-blue-400">
-        <span className="text-slate-400 text-xs mr-1">₹</span>
-        <input
-          type="number"
-          value={q[fieldKey]}
-          onChange={e => set(fieldKey, e.target.value)}
-          placeholder="0"
-          className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right"
-        />
-      </div>
-      {hint && <p className="text-[10px] text-slate-400">{hint}</p>}
-    </div>
-  );
-
   return (
     <>
       {/* Toggle button */}
@@ -924,22 +1328,22 @@ const QuickCalc = () => {
             {/* Income inputs */}
             <div className="space-y-2.5">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Income</p>
-              <QInput label="Gross Salary (after exemptions)" fieldKey="grossSalary" />
-              <QInput label="Std Deduction override" fieldKey="stdDeduction" hint={`Leave blank = auto (₹${autoStd.toLocaleString("en-IN")})`} />
-              <QInput label="Home Loan Interest (self-occ)" fieldKey="homeLoanInterest" hint="Old regime: capped ₹2L; not applied in new" />
-              <QInput label="Other Income (FD, dividends…)" fieldKey="otherIncome" />
-              <QInput label="STCG — Equity (20%)" fieldKey="stcgEquity" />
-              <QInput label="LTCG — Equity (12.5%, above ₹1.25L)" fieldKey="ltcgEquity" />
+              <QInput label="Gross Salary (after exemptions)" fieldKey="grossSalary" q={q} set={set} />
+              <QInput label="Std Deduction override" fieldKey="stdDeduction" hint={`Leave blank = auto (₹${autoStd.toLocaleString("en-IN")})`} q={q} set={set} />
+              <QInput label="Home Loan Interest (self-occ)" fieldKey="homeLoanInterest" hint="Old regime: capped ₹2L; not applied in new" q={q} set={set} />
+              <QInput label="Other Income (FD, dividends…)" fieldKey="otherIncome" q={q} set={set} />
+              <QInput label="STCG — Equity (20%)" fieldKey="stcgEquity" q={q} set={set} />
+              <QInput label="LTCG — Equity (12.5%, above ₹1.25L)" fieldKey="ltcgEquity" q={q} set={set} />
             </div>
 
             {/* Old-regime deduction inputs — only shown for old regime */}
             {q.regime === "old" && (
               <div className="space-y-2.5">
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Deductions (Old Regime)</p>
-                <QInput label="80C (max ₹1.5L)" fieldKey="sec80C" />
-                <QInput label="80D (max ₹50K shown)" fieldKey="sec80D" />
-                <QInput label="NPS 80CCD(1B) (max ₹50K)" fieldKey="nps" />
-                <QInput label="80EEA Home Loan (max ₹1.5L)" fieldKey="sec80EEA" />
+                <QInput label="80C (max ₹1.5L)" fieldKey="sec80C" q={q} set={set} />
+                <QInput label="80D (max ₹50K shown)" fieldKey="sec80D" q={q} set={set} />
+                <QInput label="NPS 80CCD(1B) (max ₹50K)" fieldKey="nps" q={q} set={set} />
+                <QInput label="80EEA Home Loan (max ₹1.5L)" fieldKey="sec80EEA" q={q} set={set} />
               </div>
             )}
 
@@ -967,62 +1371,43 @@ const QuickCalc = () => {
    TEST DATA — fill the whole form in one click
    Only visible when import.meta.env.DEV === true
 ══════════════════════════════════════════ */
+const INCOME_DEFAULTS = {
+  hasSalary: false, hasHouseProperty: false, selfOccupiedProps: [], letOutProps: [],
+  rentReceived: "", municipalTax: "", homeLoanInterest: "",
+  hasCapitalGains: false, stcgEquity: "", ltcgEquity: "", stcgOther: "", ltcgOther: "",
+  hasOtherIncome: false, interestSavings: "", interestFD: "", interestP2P: "",
+  interestBonds: "", interestPF: "", interestITRefund: "", dividends: [], otherIncome: "",
+  hasExemptOther: false, onlineGaming: "", lotteryWinnings: "", exemptIncome: "", invoiceDiscounting: "",
+  tdsSalary: "", tdsNonSalary: [], advanceTax: "", tcsPaid: "", selfTaxPayments: [], tdsProperty: [],
+};
+
 const TEST_SCENARIOS = [
   {
     label: "Salaried – New Regime",
-    personal: {
-      firstName: "Ravi", middleName: "", lastName: "Sharma",
-      dob: "1988-07-15", fatherName: "Mohan Sharma",
-      gender: "M", maritalStatus: "married",
-      flatDoorNo: "12B", premiseName: "Sunshine Apts", roadStreet: "MG Road",
-      areaLocality: "Koramangala", pincode: "560034",
-      country: "INDIA", state: "KARNATAKA", city: "Bengaluru",
-      residentialStatus: "Indian Resident",
-      aadhaar: "234567890123", pan: "ABCDE1234F",
-      mobileCountry: "+91", mobile: "9876543210", email: "ravi.sharma@email.com",
-    },
+    personal: { firstName: "Ravi", middleName: "", lastName: "Sharma", dob: "1988-07-15", fatherName: "Mohan Sharma", gender: "M", maritalStatus: "married", flatDoorNo: "12B", premiseName: "Sunshine Apts", roadStreet: "MG Road", areaLocality: "Koramangala", pincode: "560034", country: "INDIA", state: "KARNATAKA", city: "Bengaluru", residentialStatus: "Indian Resident", aadhaar: "234567890123", pan: "ABCDE1234F", mobileCountry: "+91", mobile: "9876543210", email: "ravi.sharma@email.com" },
     bankAccounts: [{ accountNumber: "12345678901", ifsc: "SBIN0001234", bankName: "State Bank of India", accountType: "savings" }],
-    salaryEntry: { employerName: "Infosys Ltd", employerTAN: "BLRI12345A", grossSalary17: "1200000", basicPay: "", hra17: "", lta17: "", others17: "", perquisites: "", profitsInLieu: "", hraExemption: "", ltaExemption: "", rentPaid: "", metroCity: false },
-    income: { hasSalary: true, hasHouseProperty: false, rentReceived: "", municipalTax: "", homeLoanInterest: "", hasCapitalGains: false, stcgEquity: "", ltcgEquity: "", stcgOther: "", ltcgOther: "", hasOtherIncome: true, interestSavings: "15000", interestFD: "20000", interestP2P: "", interestBonds: "", interestPF: "", interestITRefund: "", dividends: "", otherIncome: "" },
+    salaryEntry: { employerName: "Infosys Ltd", employerTAN: "BLRI12345A", grossSalary17: "1200000", basicPay: "", hra17: "", lta17: "", others17: "", perquisites: "", profitsInLieu: "", hraExemption: "", ltaExemption: "", rentPaid: "", metroCity: false, foreignSalaryNotified: "", foreignSalaryNonNotified: "", salaryPastYears89A: "" },
+    income: { ...INCOME_DEFAULTS, hasSalary: true, hasOtherIncome: true, interestSavings: "15000", interestFD: "20000", tdsSalary: "85000" },
     taxSaving: { regime: "new", professionalTax: "2400", arrearsRelief: "", foreignRetirementRelief: "", sec80C: "", sec80D_self: "", sec80D_parents: "", sec80D_selfSenior: false, sec80D_parentsSenior: false, sec80E: "", sec80G: "", sec80TTA: "", sec80TTB: "", nps80CCD: "", employerNps: "60000", homeLoan80EEA: "" },
   },
   {
-    label: "Salaried – Old Regime with Deductions",
-    personal: {
-      firstName: "Priya", middleName: "K", lastName: "Iyer",
-      dob: "1985-03-22", fatherName: "Krishnan Iyer",
-      gender: "F", maritalStatus: "married",
-      flatDoorNo: "5A", premiseName: "Green Park", roadStreet: "Anna Salai",
-      areaLocality: "T Nagar", pincode: "600017",
-      country: "INDIA", state: "TAMIL NADU", city: "Chennai",
-      residentialStatus: "Indian Resident",
-      aadhaar: "456789012345", pan: "BCDEF2345G",
-      mobileCountry: "+91", mobile: "9123456780", email: "priya.iyer@email.com",
-    },
+    label: "Salaried – Old Regime",
+    personal: { firstName: "Priya", middleName: "K", lastName: "Iyer", dob: "1985-03-22", fatherName: "Krishnan Iyer", gender: "F", maritalStatus: "married", flatDoorNo: "5A", premiseName: "Green Park", roadStreet: "Anna Salai", areaLocality: "T Nagar", pincode: "600017", country: "INDIA", state: "TAMIL NADU", city: "Chennai", residentialStatus: "Indian Resident", aadhaar: "456789012345", pan: "BCDEF2345G", mobileCountry: "+91", mobile: "9123456780", email: "priya.iyer@email.com" },
     bankAccounts: [{ accountNumber: "98765432100", ifsc: "HDFC0001234", bankName: "HDFC Bank", accountType: "savings" }],
-    salaryEntry: { employerName: "TCS Ltd", employerTAN: "MAAI12345B", grossSalary17: "", basicPay: "800000", hra17: "300000", lta17: "50000", others17: "50000", perquisites: "", profitsInLieu: "", hraExemption: "120000", ltaExemption: "25000", rentPaid: "180000", metroCity: true },
-    income: { hasSalary: true, hasHouseProperty: true, rentReceived: "180000", municipalTax: "10000", homeLoanInterest: "180000", hasCapitalGains: true, stcgEquity: "50000", ltcgEquity: "200000", stcgOther: "", ltcgOther: "", hasOtherIncome: true, interestSavings: "8000", interestFD: "30000", interestP2P: "", interestBonds: "", interestPF: "", interestITRefund: "", dividends: "5000", otherIncome: "" },
+    salaryEntry: { employerName: "TCS Ltd", employerTAN: "MAAI12345B", grossSalary17: "", basicPay: "800000", hra17: "300000", lta17: "50000", others17: "50000", perquisites: "", profitsInLieu: "", hraExemption: "120000", ltaExemption: "25000", rentPaid: "180000", metroCity: true, foreignSalaryNotified: "", foreignSalaryNonNotified: "", salaryPastYears89A: "" },
+    income: { ...INCOME_DEFAULTS, hasSalary: true, hasCapitalGains: true, stcgEquity: "50000", ltcgEquity: "200000", hasOtherIncome: true, interestSavings: "8000", interestFD: "30000", dividends: [{ narration: "Infosys Dividend", amount: "5000", dateOfReceipt: "2026-09-15" }], tdsSalary: "120000", tdsNonSalary: [{ deductorName: "HDFC Bank", tan: "PUNE12345A", amount: "1997" }] },
     taxSaving: { regime: "old", professionalTax: "2400", arrearsRelief: "", foreignRetirementRelief: "", sec80C: "150000", sec80D_self: "25000", sec80D_parents: "25000", sec80D_selfSenior: false, sec80D_parentsSenior: false, sec80E: "", sec80G: "10000", sec80TTA: "8000", sec80TTB: "", nps80CCD: "50000", employerNps: "", homeLoan80EEA: "" },
   },
   {
     label: "Senior Citizen – Old Regime",
-    personal: {
-      firstName: "Suresh", middleName: "", lastName: "Mehta",
-      dob: "1958-11-05", fatherName: "Ramesh Mehta",
-      gender: "M", maritalStatus: "married",
-      flatDoorNo: "8C", premiseName: "Silver Oaks", roadStreet: "Linking Road",
-      areaLocality: "Bandra West", pincode: "400050",
-      country: "INDIA", state: "MAHARASHTRA", city: "Mumbai",
-      residentialStatus: "Indian Resident",
-      aadhaar: "678901234567", pan: "CDEFG3456H",
-      mobileCountry: "+91", mobile: "9988776655", email: "suresh.mehta@email.com",
-    },
+    personal: { firstName: "Suresh", middleName: "", lastName: "Mehta", dob: "1958-11-05", fatherName: "Ramesh Mehta", gender: "M", maritalStatus: "married", flatDoorNo: "8C", premiseName: "Silver Oaks", roadStreet: "Linking Road", areaLocality: "Bandra West", pincode: "400050", country: "INDIA", state: "MAHARASHTRA", city: "Mumbai", residentialStatus: "Indian Resident", aadhaar: "678901234567", pan: "CDEFG3456H", mobileCountry: "+91", mobile: "9988776655", email: "suresh.mehta@email.com" },
     bankAccounts: [{ accountNumber: "11223344556", ifsc: "ICIC0001234", bankName: "ICICI Bank", accountType: "savings" }],
-    salaryEntry: { employerName: "Retired – Pension", employerTAN: "", grossSalary17: "600000", basicPay: "", hra17: "", lta17: "", others17: "", perquisites: "", profitsInLieu: "", hraExemption: "", ltaExemption: "", rentPaid: "", metroCity: false },
-    income: { hasSalary: true, hasHouseProperty: false, rentReceived: "", municipalTax: "", homeLoanInterest: "", hasCapitalGains: false, stcgEquity: "", ltcgEquity: "", stcgOther: "", ltcgOther: "", hasOtherIncome: true, interestSavings: "40000", interestFD: "120000", interestP2P: "", interestBonds: "", interestPF: "", interestITRefund: "", dividends: "10000", otherIncome: "" },
+    salaryEntry: { employerName: "Retired – Pension", employerTAN: "", grossSalary17: "600000", basicPay: "", hra17: "", lta17: "", others17: "", perquisites: "", profitsInLieu: "", hraExemption: "", ltaExemption: "", rentPaid: "", metroCity: false, foreignSalaryNotified: "", foreignSalaryNonNotified: "", salaryPastYears89A: "" },
+    income: { ...INCOME_DEFAULTS, hasSalary: true, hasOtherIncome: true, interestSavings: "40000", interestFD: "120000", dividends: [{ narration: "SBI Dividend", amount: "10000", dateOfReceipt: "2026-11-20" }], tdsSalary: "30000", tdsNonSalary: [{ deductorName: "EPFO", tan: "THNE12345B", amount: "12000" }] },
     taxSaving: { regime: "old", professionalTax: "", arrearsRelief: "", foreignRetirementRelief: "", sec80C: "100000", sec80D_self: "50000", sec80D_parents: "", sec80D_selfSenior: true, sec80D_parentsSenior: false, sec80E: "", sec80G: "", sec80TTA: "", sec80TTB: "50000", nps80CCD: "", employerNps: "", homeLoan80EEA: "" },
   },
 ];
+
 
 /* ══════════════════════════════════════════
    MAIN COMPONENT
@@ -1100,11 +1485,12 @@ const ITRFilingForm = () => {
   /* ── Income Sources state ── */
   const [income, setIncome] = useState({
     hasSalary: false,
-    grossSalary: "",
-    hra: "",
-    lta: "",
-    otherAllowances: "",
     hasHouseProperty: false,
+    // Self-occupied properties (array)
+    selfOccupiedProps: [],
+    // Let-out properties (array)
+    letOutProps: [],
+    // legacy flat fields kept for backward compat with useMemo (derived from arrays)
     rentReceived: "",
     municipalTax: "",
     homeLoanInterest: "",
@@ -1120,7 +1506,7 @@ const ITRFilingForm = () => {
     interestBonds: "",
     interestPF: "",
     interestITRefund: "",
-    dividends: "",
+    dividends: [],        // [{narration, amount, dateOfReceipt}]
     otherIncome: "",
     // Exempt & special-rate income
     hasExemptOther: false,
@@ -1129,8 +1515,10 @@ const ITRFilingForm = () => {
     exemptIncome: "",
     invoiceDiscounting: "",
     // Taxes already paid
+    selfTaxPayments: [],   // [{bsrCode, challanNo, date, amount, type}]
     tdsSalary: "",
-    tdsNonSalary: "",
+    tdsNonSalary: [],      // [{deductorName, tan, amount}]
+    tdsProperty: [],       // [{deductorName, pan, amount}]
     advanceTax: "",
     tcsPaid: "",
   });
@@ -1212,23 +1600,36 @@ const ITRFilingForm = () => {
     const salaryNew = income.hasSalary ? salaryEntries.reduce((sum, e) => sum + getSalaryTotal(e, false), 0) : 0;
 
     // ── House property income ──
-    // Old regime: home loan interest deductible up to ₹2L (self-occupied cap per sec 24(b));
-    //   any resulting loss (up to ₹2L) can be set off against other heads.
-    // New regime: no deduction for home loan interest on self-occupied property.
-    const rawRent      = income.hasHouseProperty ? toNum(income.rentReceived) : 0;
-    const rawMunicipal = income.hasHouseProperty ? toNum(income.municipalTax)  : 0;
-    const rawInterest  = income.hasHouseProperty ? toNum(income.homeLoanInterest) : 0;
-    const cappedInterestOld = Math.min(rawInterest, 200_000); // sec 24(b) ₹2L cap
-    // Net annual value after std deduction of 30% on let-out (ignored here — simplified to rent - municipal)
-    const houseIncomeOld = rawRent > 0
-      ? rawRent - rawMunicipal - cappedInterestOld   // let-out: can be negative (loss)
-      : -cappedInterestOld;                          // self-occupied: only interest loss
-    // Loss from house property is capped at ₹2L for set-off; carry-forward ignored in estimator
+    const soProps  = income.hasHouseProperty ? (income.selfOccupiedProps  || []) : [];
+    const letProps = income.hasHouseProperty ? (income.letOutProps || []) : [];
+
+    // Self-occupied: home loan interest loss capped at ₹2L total (sec 24(b))
+    const soInterestTotal  = soProps.reduce((s, p) => s + toNum(p.homeLoanDeduction), 0);
+    const cappedSOInterest = Math.min(soInterestTotal, 200_000);
+
+    // Let-out: rent - municipal - 30% std deduction u/s 24a - home loan interest (uncapped)
+    const letOutNetIncome = letProps.reduce((s, p) => {
+      const rent   = toNum(p.rentReceived);
+      const muni   = toNum(p.municipalTax);
+      const stdDed = Math.round((rent - muni) * 0.30);
+      const loan   = toNum(p.homeLoanDeduction);
+      return s + (rent - muni - stdDed - loan);
+    }, 0);
+
+    // Flat-field fallback when no arrays filled yet
+    const rawRent      = letProps.length === 0 ? (income.hasHouseProperty ? toNum(income.rentReceived) : 0) : 0;
+    const rawMunicipal = letProps.length === 0 ? (income.hasHouseProperty ? toNum(income.municipalTax)  : 0) : 0;
+    const rawInterest  = soProps.length  === 0 ? (income.hasHouseProperty ? toNum(income.homeLoanInterest) : 0) : 0;
+    const cappedInterestOld = Math.min(rawInterest, 200_000);
+
+    const houseIncomeOld = (soProps.length + letProps.length) > 0
+      ? letOutNetIncome - cappedSOInterest
+      : (rawRent > 0 ? rawRent - rawMunicipal - cappedInterestOld : -cappedInterestOld);
     const houseIncomeOldCapped = Math.max(houseIncomeOld, -200_000);
-    // New regime: no interest deduction on self-occupied; for let-out only municipal & 30% std deduction allowed
-    const houseIncomeNew = rawRent > 0
-      ? Math.max(0, rawRent - rawMunicipal)          // let-out, no interest deduction
-      : 0;                                           // self-occupied: no deduction available
+
+    const houseIncomeNew = letProps.length > 0
+      ? letOutNetIncome
+      : (rawRent > 0 ? Math.max(0, rawRent - rawMunicipal) : 0);
 
     // Capital gains taxed at special flat rates (not in slab income)
     const stcgEquityTax  = income.hasCapitalGains ? Math.round(toNum(income.stcgEquity) * 0.20 * 1.04) : 0;
@@ -1237,7 +1638,7 @@ const ITRFilingForm = () => {
     const slabCapGains   = income.hasCapitalGains ? toNum(income.stcgOther) : 0;
 
     const other = income.hasOtherIncome
-      ? toNum(income.interestSavings) + toNum(income.interestFD) + toNum(income.interestP2P) + toNum(income.interestBonds) + toNum(income.interestPF) + toNum(income.interestITRefund) + toNum(income.dividends) + toNum(income.otherIncome)
+      ? toNum(income.interestSavings) + toNum(income.interestFD) + toNum(income.interestP2P) + toNum(income.interestBonds) + toNum(income.interestPF) + toNum(income.interestITRefund) + (Array.isArray(income.dividends) ? income.dividends.reduce((s, d) => s + toNum(d.amount), 0) : toNum(income.dividends)) + toNum(income.otherIncome)
       : 0;
 
     const professionalTaxOld = Math.min(salaryOld, toNum(taxSaving.professionalTax));
@@ -1271,8 +1672,7 @@ const ITRFilingForm = () => {
     const newStandardDeduction = Math.min(salaryNew, STD_DEDUCTION_NEW);
 
     const taxableOld = Math.max(0, grossOld - oldStandardDeduction - professionalTaxOld - retirementReliefOld - totalDeductions);
-    const newRegimeDeductions = toNum(taxSaving.employerNps);
-    const taxableNew = Math.max(0, grossNew - newStandardDeduction - professionalTaxNew - retirementReliefNew - newRegimeDeductions);
+    const taxableNew = Math.max(0, grossNew - newStandardDeduction - professionalTaxNew - retirementReliefNew - employerNpsDeduction);
 
     const specialRateIncome = income.hasCapitalGains
       ? toNum(income.stcgEquity) + toNum(income.ltcgEquity) + toNum(income.ltcgOther)
@@ -1296,7 +1696,11 @@ const ITRFilingForm = () => {
     const totalTaxLiability = Math.max(0, chosen + gamingTax + lotteryTax);
 
     // Taxes already paid
-    const totalTaxPaid = toNum(income.tdsSalary) + toNum(income.tdsNonSalary) + toNum(income.advanceTax) + toNum(income.tcsPaid);
+    const totalTaxPaid = toNum(income.tdsSalary)
+      + (Array.isArray(income.tdsNonSalary) ? income.tdsNonSalary.reduce((s, t) => s + toNum(t.amount), 0) : toNum(income.tdsNonSalary))
+      + (Array.isArray(income.tdsProperty)  ? income.tdsProperty.reduce((s, t)  => s + toNum(t.amount), 0) : 0)
+      + (Array.isArray(income.selfTaxPayments) ? income.selfTaxPayments.reduce((s, t) => s + toNum(t.amount), 0) : 0)
+      + toNum(income.advanceTax) + toNum(income.tcsPaid);
     const refundOrDue  = totalTaxPaid - totalTaxLiability; // positive = refund, negative = due
 
     // ITR type recommendation
@@ -1326,9 +1730,14 @@ const ITRFilingForm = () => {
 
   /* ── Navigation ── */
   const goNext = () => {
-    // Allow checking later sections without completing every field first.
-    // Clear any errors left by an earlier validation attempt so they don't
-    // look like they are still blocking navigation.
+    if (step === 0) {
+      const errs = validatePersonal();
+      if (Object.keys(errs).length > 0) {
+        setErrors(errs);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+    }
     setErrors({});
     setStep((s) => s + 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1899,22 +2308,15 @@ const ITRFilingForm = () => {
               })()}
 
               {/* House Property */}
-              <FormSection icon={<Home size={16} />} title="House Property" subtitle="Rental income, self-occupied or let-out property">
+              <FormSection icon={<Home size={16} />} title="House Property" subtitle="Add details if you earned rent from your property or paid interest on home loan" badge={income.hasHouseProperty && (income.selfOccupiedProps?.length > 0 || income.letOutProps?.length > 0) ? "Details Added" : undefined}>
                 <div className="mt-3 mb-4">
                   <label className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" name="hasHouseProperty" checked={income.hasHouseProperty} onChange={handleIncome}
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
+                    <input type="checkbox" name="hasHouseProperty" checked={income.hasHouseProperty} onChange={handleIncome} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                     <span className="text-sm font-semibold text-slate-700">I have house property income / loss</span>
                   </label>
                 </div>
                 {income.hasHouseProperty && (
-                  <div className="space-y-4 mt-4">
-                    <FloatingInput label="Annual Rent Received (₹)" name="rentReceived" type="number" value={income.rentReceived} onChange={handleIncome} />
-                    <div className="grid grid-cols-2 gap-4">
-                      <FloatingInput label="Municipal Tax Paid (₹)" name="municipalTax" type="number" value={income.municipalTax} onChange={handleIncome} />
-                      <FloatingInput label="Home Loan Interest (₹)" name="homeLoanInterest" type="number" value={income.homeLoanInterest} onChange={handleIncome} hint="Old regime: max ₹2L deduction u/s 24(b); loss up to ₹2L can offset other income. New regime: no deduction for self-occupied." />
-                    </div>
-                  </div>
+                  <HousePropertySection income={income} setIncome={setIncome} personal={personal} />
                 )}
               </FormSection>
 
@@ -1964,8 +2366,62 @@ const ITRFilingForm = () => {
                       <FloatingInput label="Interest — Provident Fund (₹)" name="interestPF" type="number" value={income.interestPF} onChange={handleIncome} hint="EPF / RPF interest (taxable portion above threshold)" />
                       <FloatingInput label="Interest — IT Refund (₹)" name="interestITRefund" type="number" value={income.interestITRefund} onChange={handleIncome} hint="Interest received along with last year's tax refund" />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <FloatingInput label="Dividends (₹)" name="dividends" type="number" value={income.dividends} onChange={handleIncome} />
+                    <div className="space-y-3">
+                      {/* Dividends — row table */}
+                      <div className="border border-slate-200 rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-3 bg-slate-50">
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">Dividend Income from Equities, Stocks, Mutual Funds etc.</p>
+                            <p className="text-xs text-slate-500">You may see dividend details in your Form 26AS or P&L Reports (e.g. Zerodha P&L)</p>
+                          </div>
+                          <span className="text-sm font-bold text-slate-700">
+                            ₹{(income.dividends || []).reduce((s, d) => s + toNum(d.amount), 0).toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="px-4 py-4 space-y-3">
+                          {/* Header row */}
+                          <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
+                            {["Narration", "Amount (₹)", "Date of Receipt", ""].map(h => (
+                              <p key={h} className="text-xs font-bold text-slate-600">{h}</p>
+                            ))}
+                          </div>
+                          {/* Data rows */}
+                          {(income.dividends || []).map((d, i) => (
+                            <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center">
+                              <input
+                                value={d.narration}
+                                onChange={e => setIncome(p => ({ ...p, dividends: p.dividends.map((x, idx) => idx === i ? { ...x, narration: e.target.value } : x) }))}
+                                placeholder="e.g. HDFC Bank Dividend"
+                                className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                              />
+                              <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                                <span className="text-slate-400 text-sm mr-1">₹</span>
+                                <input
+                                  type="number"
+                                  value={d.amount}
+                                  onChange={e => setIncome(p => ({ ...p, dividends: p.dividends.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))}
+                                  placeholder="0"
+                                  className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right"
+                                />
+                              </div>
+                              <input
+                                type="date"
+                                value={d.dateOfReceipt}
+                                onChange={e => setIncome(p => ({ ...p, dividends: p.dividends.map((x, idx) => idx === i ? { ...x, dateOfReceipt: e.target.value } : x) }))}
+                                className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                              />
+                              <button type="button"
+                                onClick={() => setIncome(p => ({ ...p, dividends: p.dividends.filter((_, idx) => idx !== i) }))}
+                                className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+                            </div>
+                          ))}
+                          <button type="button"
+                            onClick={() => setIncome(p => ({ ...p, dividends: [...(p.dividends || []), { narration: "", amount: "", dateOfReceipt: "" }] }))}
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 mt-1">
+                            <Plus size={11} className="border border-blue-600 rounded-full" /> Add more items
+                          </button>
+                        </div>
+                      </div>
                       <FloatingInput label="Any Other Income (₹)" name="otherIncome" type="number" value={income.otherIncome} onChange={handleIncome} hint="NSC, unsecured loans, gifts etc." />
                     </div>
                   </div>
@@ -2010,27 +2466,155 @@ const ITRFilingForm = () => {
                 icon={<CreditCard size={16} />}
                 title="Taxes Paid, TDS and TCS"
                 subtitle="TDS or TCS Payments, Payments for Advance Taxes or Tax due and others. Upload Form 26AS to fetch these details."
-                badge={(toNum(income.tdsSalary) + toNum(income.tdsNonSalary) + toNum(income.advanceTax) + toNum(income.tcsPaid)) > 0 ? "Details Added" : undefined}
+                badge={(toNum(income.tdsSalary) + (income.tdsNonSalary||[]).reduce((s,t)=>s+toNum(t.amount),0) + (income.tdsProperty||[]).reduce((s,t)=>s+toNum(t.amount),0) + (income.selfTaxPayments||[]).reduce((s,t)=>s+toNum(t.amount),0) + toNum(income.advanceTax) + toNum(income.tcsPaid)) > 0 ? "Details Added" : undefined}
                 defaultOpen={false}
               >
-                <div className="mt-4 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <FloatingInput label="TDS on Salary (₹)" name="tdsSalary" type="number" value={income.tdsSalary} onChange={handleIncome} hint="As per Form 16 / Form 26AS" />
-                    <FloatingInput label="Non-Salary TDS (₹)" name="tdsNonSalary" type="number" value={income.tdsNonSalary} onChange={handleIncome} hint="TDS on FD interest, rent, professional fees etc." />
+                <div className="mt-4 space-y-3">
+
+                  {/* 1. Self Tax Payments (Challan 280) */}
+                  <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">🧾</span>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">Self Tax Payments <span className="text-slate-400 font-normal">(For Tax Due / Advance Tax)</span></p>
+                          <p className="text-xs text-slate-500">Add details if you have paid directly any taxes to the Govt. (via Challan 280)</p>
+                        </div>
+                      </div>
+                      <button type="button"
+                        onClick={() => setIncome(p => ({ ...p, selfTaxPayments: [...(p.selfTaxPayments || []), { bsrCode: "", challanNo: "", date: "", amount: "", type: "Advance Tax" }] }))}
+                        className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">
+                        + Add Details
+                      </button>
+                    </div>
+                    {(income.selfTaxPayments || []).length > 0 && (
+                      <div className="px-4 py-4 space-y-3">
+                        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
+                          {["BSR Code", "Challan No.", "Date", "Amount (₹)", ""].map(h => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+                        </div>
+                        {income.selfTaxPayments.map((t, i) => (
+                          <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 items-center">
+                            <input value={t.bsrCode} onChange={e => setIncome(p => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, bsrCode: e.target.value } : x) }))} placeholder="BSR Code" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                            <input value={t.challanNo} onChange={e => setIncome(p => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, challanNo: e.target.value } : x) }))} placeholder="Challan No." className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                            <input type="date" value={t.date} onChange={e => setIncome(p => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, date: e.target.value } : x) }))} className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                            <div className="flex items-center border border-slate-300 rounded-lg px-2 py-2 bg-white">
+                              <span className="text-slate-400 text-xs mr-1">₹</span>
+                              <input type="number" value={t.amount} onChange={e => setIncome(p => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))} placeholder="0" className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right w-0 min-w-0" />
+                            </div>
+                            <button type="button" onClick={() => setIncome(p => ({ ...p, selfTaxPayments: p.selfTaxPayments.filter((_, idx) => idx !== i) }))} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+
+                  {/* 2. TDS on Salary */}
+                  <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">💰</span>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">TDS on Salary</p>
+                          <p className="text-xs text-slate-500">This is TDS deducted from salary, check Salary page for any changes.</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-4 py-4">
+                      <FloatingInput label="TDS on Salary (₹)" name="tdsSalary" type="number" value={income.tdsSalary} onChange={handleIncome} hint="As per Form 16 / Form 26AS — total TDS deducted by employer" />
+                    </div>
+                  </div>
+
+                  {/* 3. Non-Salary TDS */}
+                  <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">📊</span>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">Non Salary TDS</p>
+                          <p className="text-xs text-slate-500">Add TDS deducted on interest income, professional or consulting income</p>
+                        </div>
+                      </div>
+                      <button type="button"
+                        onClick={() => setIncome(p => ({ ...p, tdsNonSalary: [...(p.tdsNonSalary || []), { deductorName: "", tan: "", amount: "" }] }))}
+                        className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">
+                        + Add Details
+                      </button>
+                    </div>
+                    {(income.tdsNonSalary || []).length > 0 && (
+                      <div className="px-4 py-4 space-y-3">
+                        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
+                          {["Deductor Name", "TAN", "Amount (₹)", ""].map(h => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+                        </div>
+                        {income.tdsNonSalary.map((t, i) => (
+                          <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center">
+                            <input value={t.deductorName} onChange={e => setIncome(p => ({ ...p, tdsNonSalary: p.tdsNonSalary.map((x, idx) => idx === i ? { ...x, deductorName: e.target.value } : x) }))} placeholder="e.g. HDFC Bank" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                            <input value={t.tan} onChange={e => setIncome(p => ({ ...p, tdsNonSalary: p.tdsNonSalary.map((x, idx) => idx === i ? { ...x, tan: e.target.value.toUpperCase() } : x) }))} placeholder="TAN" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                            <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                              <span className="text-slate-400 text-sm mr-1">₹</span>
+                              <input type="number" value={t.amount} onChange={e => setIncome(p => ({ ...p, tdsNonSalary: p.tdsNonSalary.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))} placeholder="0" className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right" />
+                            </div>
+                            <button type="button" onClick={() => setIncome(p => ({ ...p, tdsNonSalary: p.tdsNonSalary.filter((_, idx) => idx !== i) }))} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 4. TDS on Sale/Rent of Property */}
+                  <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">🏠</span>
+                        <div>
+                          <p className="text-sm font-bold text-slate-800">TDS on Sale / Rent of Immovable Property</p>
+                          <p className="text-xs text-slate-500">Add TDS details if you have sold / rented land, house, property or building etc.</p>
+                        </div>
+                      </div>
+                      <button type="button"
+                        onClick={() => setIncome(p => ({ ...p, tdsProperty: [...(p.tdsProperty || []), { deductorName: "", pan: "", amount: "" }] }))}
+                        className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">
+                        + Add Details
+                      </button>
+                    </div>
+                    {(income.tdsProperty || []).length > 0 && (
+                      <div className="px-4 py-4 space-y-3">
+                        <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
+                          {["Deductor Name", "PAN of Buyer/Tenant", "Amount (₹)", ""].map(h => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+                        </div>
+                        {income.tdsProperty.map((t, i) => (
+                          <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center">
+                            <input value={t.deductorName} onChange={e => setIncome(p => ({ ...p, tdsProperty: p.tdsProperty.map((x, idx) => idx === i ? { ...x, deductorName: e.target.value } : x) }))} placeholder="Name" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                            <input value={t.pan} onChange={e => setIncome(p => ({ ...p, tdsProperty: p.tdsProperty.map((x, idx) => idx === i ? { ...x, pan: e.target.value.toUpperCase() } : x) }))} placeholder="PAN" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                            <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                              <span className="text-slate-400 text-sm mr-1">₹</span>
+                              <input type="number" value={t.amount} onChange={e => setIncome(p => ({ ...p, tdsProperty: p.tdsProperty.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))} placeholder="0" className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right" />
+                            </div>
+                            <button type="button" onClick={() => setIncome(p => ({ ...p, tdsProperty: p.tdsProperty.filter((_, idx) => idx !== i) }))} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* TCS + Advance Tax (flat fields) */}
+                  <div className="grid grid-cols-2 gap-4 pt-1">
                     <FloatingInput label="Advance Tax Paid (₹)" name="advanceTax" type="number" value={income.advanceTax} onChange={handleIncome} hint="Self-assessment / advance tax challan payments" />
                     <FloatingInput label="TCS Collected (₹)" name="tcsPaid" type="number" value={income.tcsPaid} onChange={handleIncome} hint="Tax Collected at Source — LRS, car purchase etc." />
                   </div>
-                  {/* Total paid summary */}
-                  {(toNum(income.tdsSalary) + toNum(income.tdsNonSalary) + toNum(income.advanceTax) + toNum(income.tcsPaid)) > 0 && (
-                    <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-                      <span className="text-sm font-semibold text-slate-700">Total Taxes Paid</span>
-                      <span className="text-sm font-bold text-slate-900">
-                        {fmt(toNum(income.tdsSalary) + toNum(income.tdsNonSalary) + toNum(income.advanceTax) + toNum(income.tcsPaid))}
-                      </span>
-                    </div>
-                  )}
+
+                  {/* Total */}
+                  <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                    <span className="text-sm font-semibold text-slate-700">Total Taxes Paid</span>
+                    <span className="text-sm font-bold text-slate-900">
+                      {fmt(
+                        toNum(income.tdsSalary) +
+                        (income.tdsNonSalary || []).reduce((s, t) => s + toNum(t.amount), 0) +
+                        (income.tdsProperty  || []).reduce((s, t) => s + toNum(t.amount), 0) +
+                        (income.selfTaxPayments || []).reduce((s, t) => s + toNum(t.amount), 0) +
+                        toNum(income.advanceTax) + toNum(income.tcsPaid)
+                      )}
+                    </span>
+                  </div>
                 </div>
               </FormSection>
             </div>
