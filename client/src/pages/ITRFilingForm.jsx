@@ -1376,7 +1376,7 @@ const INCOME_DEFAULTS = {
   rentReceived: "", municipalTax: "", homeLoanInterest: "",
   hasCapitalGains: false, stcgEquity: "", ltcgEquity: "", stcgOther: "", ltcgOther: "",
   hasOtherIncome: false, interestSavings: "", interestFD: "", interestP2P: "",
-  interestBonds: "", interestPF: "", interestITRefund: "", dividends: [], otherIncome: "",
+  interestBonds: "", interestPF: "", interestITRefund: "", dividends: [], otherIncome: [],
   hasExemptOther: false, onlineGaming: "", lotteryWinnings: "", exemptIncome: "", invoiceDiscounting: "",
   tdsSalary: "", tdsNonSalary: [], advanceTax: "", tcsPaid: "", selfTaxPayments: [], tdsProperty: [],
 };
@@ -1507,7 +1507,7 @@ const ITRFilingForm = () => {
     interestPF: "",
     interestITRefund: "",
     dividends: [],        // [{narration, amount, dateOfReceipt}]
-    otherIncome: "",
+    otherIncome: [],      // [{source, amount}]
     // Exempt & special-rate income
     hasExemptOther: false,
     onlineGaming: "",
@@ -1638,7 +1638,7 @@ const ITRFilingForm = () => {
     const slabCapGains   = income.hasCapitalGains ? toNum(income.stcgOther) : 0;
 
     const other = income.hasOtherIncome
-      ? toNum(income.interestSavings) + toNum(income.interestFD) + toNum(income.interestP2P) + toNum(income.interestBonds) + toNum(income.interestPF) + toNum(income.interestITRefund) + (Array.isArray(income.dividends) ? income.dividends.reduce((s, d) => s + toNum(d.amount), 0) : toNum(income.dividends)) + toNum(income.otherIncome)
+      ? toNum(income.interestSavings) + toNum(income.interestFD) + toNum(income.interestP2P) + toNum(income.interestBonds) + toNum(income.interestPF) + toNum(income.interestITRefund) + (Array.isArray(income.dividends) ? income.dividends.reduce((s, d) => s + toNum(d.amount), 0) : toNum(income.dividends)) + (Array.isArray(income.otherIncome) ? income.otherIncome.reduce((s, r) => s + toNum(r.amount), 0) : toNum(income.otherIncome))
       : 0;
 
     const professionalTaxOld = Math.min(salaryOld, toNum(taxSaving.professionalTax));
@@ -2422,7 +2422,70 @@ const ITRFilingForm = () => {
                           </button>
                         </div>
                       </div>
-                      <FloatingInput label="Any Other Income (₹)" name="otherIncome" type="number" value={income.otherIncome} onChange={handleIncome} hint="NSC, unsecured loans, gifts etc." />
+                      {/* Any Other Income — source dropdown + amount rows */}
+                      <div className="border border-slate-200 rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between px-4 py-3 bg-slate-50">
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">Any Other Income</p>
+                            <p className="text-xs text-slate-500">Family pension, gifts, freelance, NSC, winnings, commission etc.</p>
+                          </div>
+                          <span className="text-sm font-bold text-slate-700">
+                            ₹{(income.otherIncome || []).reduce((s, r) => s + toNum(r.amount), 0).toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="px-4 py-4 space-y-3">
+                          {(income.otherIncome || []).length > 0 && (
+                            <div className="grid grid-cols-[1fr_1fr_auto] gap-3">
+                              {["Source", "Amount (₹)", ""].map(h => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+                            </div>
+                          )}
+                          {(income.otherIncome || []).map((row, i) => (
+                            <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-3 items-center">
+                              <select
+                                value={row.source}
+                                onChange={e => setIncome(p => ({ ...p, otherIncome: p.otherIncome.map((x, idx) => idx === i ? { ...x, source: e.target.value } : x) }))}
+                                className="border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 appearance-none"
+                              >
+                                <option value="">Select source…</option>
+                                <option value="Family Pension">Family Pension</option>
+                                <option value="Commission / Brokerage">Commission / Brokerage</option>
+                                <option value="Freelance / Consulting">Freelance / Consulting</option>
+                                <option value="Gifts received">Gifts received</option>
+                                <option value="NSC Interest">NSC Interest</option>
+                                <option value="KVP Interest">KVP Interest</option>
+                                <option value="Post Office MIS">Post Office MIS</option>
+                                <option value="Gratuity (taxable portion)">Gratuity (taxable portion)</option>
+                                <option value="VRS / Leave Encashment">VRS / Leave Encashment</option>
+                                <option value="Agricultural Income (taxable)">Agricultural Income (taxable)</option>
+                                <option value="Rental income (not HP)">Rental income (not HP)</option>
+                                <option value="Interest from loans given">Interest from loans given</option>
+                                <option value="Winnings (crossword, horse race)">Winnings (crossword, horse race)</option>
+                                <option value="Director's fees / sitting fees">Director's fees / sitting fees</option>
+                                <option value="Alimony received">Alimony received</option>
+                                <option value="Others">Others</option>
+                              </select>
+                              <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                                <span className="text-slate-400 text-sm mr-1">₹</span>
+                                <input
+                                  type="number"
+                                  value={row.amount}
+                                  onChange={e => setIncome(p => ({ ...p, otherIncome: p.otherIncome.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))}
+                                  placeholder="0"
+                                  className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right"
+                                />
+                              </div>
+                              <button type="button"
+                                onClick={() => setIncome(p => ({ ...p, otherIncome: p.otherIncome.filter((_, idx) => idx !== i) }))}
+                                className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+                            </div>
+                          ))}
+                          <button type="button"
+                            onClick={() => setIncome(p => ({ ...p, otherIncome: [...(p.otherIncome || []), { source: "", amount: "" }] }))}
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 mt-1">
+                            <Plus size={11} className="border border-blue-600 rounded-full" /> Add more items
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
