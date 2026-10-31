@@ -16,3 +16,15 @@
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+/* ── Hide number input spinner arrows (Chrome, Safari, Edge) ── */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* ── Hide number input spinner arrows (Firefox) ── */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
