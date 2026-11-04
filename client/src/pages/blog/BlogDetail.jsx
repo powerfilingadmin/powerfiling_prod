@@ -230,7 +230,7 @@ const BlogDetail = () => {
         <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5">
           {/* Left text */}
           <p className="text-sm sm:text-base font-medium text-slate-200 text-center sm:text-left">
-            📅 Deadline for ITR 3 & 4 is{" "}
+            📅 Deadline for revised ITR 3 & 4 is{" "}
             <strong className="text-white text-base sm:text-lg">31st August</strong>{" "}
             — Don't miss it!
           </p>
