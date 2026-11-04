@@ -999,10 +999,6 @@ const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
             <span className="text-sm font-bold text-slate-800">
               2. Exempt allowances like HRA, LTA etc.
             </span>
-
-            <span className="text-xs text-blue-500 ml-2 cursor-pointer hover:underline">
-              Read More
-            </span>
           </div>
         </div>
 
@@ -1157,13 +1153,6 @@ const HRAExemptionModal = ({ entry, onClose, onSave }) => {
                 {(parseFloat(hraExemption) || autoCalc).toLocaleString("en-IN")}
               </span>
             </span>
-
-            <button
-              type="button"
-              className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
-            >
-              View More Details <ArrowRight size={11} />
-            </button>
           </div>
 
           {/* Metro toggle */}
@@ -1271,17 +1260,8 @@ const HRAExemptionModal = ({ entry, onClose, onSave }) => {
           {/* Footer links */}
 
           <div className="flex items-center gap-4 text-sm font-semibold text-blue-600">
-            <button type="button" className="hover:text-blue-700">
+            <button type="button" className="hover:text-blue-700" onClick={onOpenHRA}>
               Add HRA Exemption
-            </button>
-
-            <span className="text-slate-300">|</span>
-
-            <button
-              type="button"
-              className="hover:text-blue-700 flex items-center gap-1"
-            >
-              View More Details <ArrowRight size={12} />
             </button>
           </div>
         </div>
@@ -1415,10 +1395,6 @@ const OtherSalaryComponents = ({ entry, updateSalaryEntry }) => {
 
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-slate-700">{label}</p>
-
-                <span className="text-xs text-blue-500 cursor-pointer hover:underline">
-                  Read More
-                </span>
               </div>
 
               {/* ₹ input */}
@@ -3946,9 +3922,6 @@ const Step1IncomeSources = ({
                           <span className="text-sm font-bold text-slate-800">
                             1. Gross Salary
                           </span>
-                          <span className="text-xs text-blue-500 cursor-pointer hover:underline">
-                            Read More
-                          </span>
                         </div>
                         <span className="text-sm font-bold text-slate-800">
                           {s171 > 0 ? `₹${s171.toLocaleString("en-IN")}` : "—"}
@@ -3961,9 +3934,6 @@ const Step1IncomeSources = ({
                           <div className="min-w-0">
                             <span className="text-xs text-slate-600 font-medium">
                               17(1) : Basic, HRA, LTA &amp; other allowances
-                            </span>
-                            <span className="text-xs text-blue-500 ml-2 cursor-pointer hover:underline">
-                              Read More
                             </span>
                           </div>
                           <CurrencyInput
@@ -4036,15 +4006,9 @@ const Step1IncomeSources = ({
                               </div>
                             ))}
                           </div>
-                          <button
-                            type="button"
-                            className="mt-3 text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1"
-                          >
-                            Edit Breakup <ArrowRight size={11} />
-                          </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
                     {/* 2. Exempt Allowances — HRA, LTA */}
                     <ExemptAllowances
@@ -4059,9 +4023,6 @@ const Step1IncomeSources = ({
                         <div>
                           <span className="text-sm font-bold text-slate-800">
                             2. Perquisites u/s 17(2)
-                          </span>
-                          <span className="text-xs text-blue-500 ml-2 cursor-pointer hover:underline">
-                            Read More
                           </span>
                         </div>
                         <span className="text-sm font-bold text-slate-800">
@@ -4093,9 +4054,6 @@ const Step1IncomeSources = ({
                         <div>
                           <span className="text-sm font-bold text-slate-800">
                             3. Profits in lieu of salary u/s 17(3)
-                          </span>
-                          <span className="text-xs text-blue-500 ml-2 cursor-pointer hover:underline">
-                            Read More
                           </span>
                         </div>
                         <span className="text-sm font-bold text-slate-800">
@@ -6481,3 +6439,4 @@ const ITRFilingForm = () => {
 };
 
 export default ITRFilingForm;
+
