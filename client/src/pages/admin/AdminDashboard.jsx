@@ -122,7 +122,7 @@ const AdminDashboard = () => {
                 setLoading(false);
                 return;
             }
-
+            console.log("Fetching admin data...");
             const results = await Promise.allSettled(requests);
             
             let usersData = [], paymentsData = [], itrsData = [], requestsData = [];
