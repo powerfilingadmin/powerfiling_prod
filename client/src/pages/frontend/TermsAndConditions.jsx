@@ -44,10 +44,10 @@ const TermsAndConditions = () => {
     {
       title: "3. Use of and Access to the Platform",
       points: [
-        "You agree to use the Platform only for lawful purposes and you are responsible for all activities that take place through your use of the Platform.",
-        "The Payment facility provided is merely an electronic payment option using existing authorized banking infrastructure and payment gateway networks. We are neither acting as Trustees nor acting in a fiduciary capacity with respect to the transaction.",
-        "We will use commercially reasonable efforts to provide you with the Platform. We do not make any commitment that the Platform will be available at all times or during any downtime caused by various factors beyond our control.",
-        "From time to time, we may provide upgrades, patches, enhancements, or fixes for the Platform. We have no obligation to provide any such updates.",
+        "3.1 You agree to use the Platform only for lawful purposes and you are responsible for all activities that take place through your use of the Platform.",
+        "3.2 The Payment facility provided is merely an electronic payment option using existing authorized banking infrastructure and payment gateway networks. We are neither acting as Trustees nor acting in a fiduciary capacity with respect to the transaction.",
+        "3.3 We will use commercially reasonable efforts to provide you with the Platform. We do not make any commitment that the Platform will be available at all times or during any downtime caused by various factors beyond our control.",
+        "3.4 From time to time, we may provide upgrades, patches, enhancements, or fixes for the Platform. We have no obligation to provide any such updates.",
       ],
     },
     {

@@ -38,11 +38,11 @@ import Footer from "./frontend/Footer";
 
 import { useAuth } from "../context/AuthContext";
 
-/* ─── Geo data (module-level, computed once) ─── */
+/* --- Geo data (module-level, computed once) --- */
 
 const COUNTRIES = getData(); // [{ code, name }]
 
-/* ─── State + UT options from knowindia package ─── */
+/* --- State + UT options from knowindia package --- */
 const _statesData = getStates();
 const _utsData    = getUTs();
 // Combine states and UTs, sort alphabetically, build options
@@ -58,7 +58,7 @@ const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({
   label: c.name.toUpperCase(),
 }));
 
-/* ─── Validation regexes (module-level) ─── */
+/* --- Validation regexes (module-level) --- */
 
 const PINCODE_RE = /^\d{6}$/;
 
@@ -70,11 +70,11 @@ const MOBILE_RE = /^\d{10}$/;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/* ─── Pure helpers (module-level, no closure) ─── */
+/* --- Pure helpers (module-level, no closure) --- */
 
 const toNum = (v) => Math.max(0, parseFloat(v) || 0);
 
-const fmt = (n) => `₹${Math.abs(n).toLocaleString("en-IN")}`;
+const fmt = (n) => `?${Math.abs(n).toLocaleString("en-IN")}`;
 
 const fullName = (p) =>
   [p.firstName, p.middleName, p.lastName].filter(Boolean).join(" ");
@@ -129,7 +129,7 @@ const isSuperSeniorForTaxYear = (dob) => {
   return ageOnYearEnd >= 80;
 };
 
-/* ─── Tax rules for Tax Year 2026-27 (module-level) ─── */
+/* --- Tax rules for Tax Year 2026-27 (module-level) --- */
 
 const STD_DEDUCTION_NEW = 75_000;
 
@@ -146,7 +146,7 @@ const calcTax = (
   let tax = 0;
 
   if (regime === "old") {
-    // Basic exemption thresholds: super-senior ₹5L, senior ₹3L, general ₹2.5L
+    // Basic exemption thresholds: super-senior ?5L, senior ?3L, general ?2.5L
 
     const exempt = isSuperSenior ? 500_000 : isSenior ? 300_000 : 250_000;
 
@@ -158,9 +158,9 @@ const calcTax = (
       tax =
         (500_000 - exempt) * 0.05 + 100_000 + (taxableIncome - 1_000_000) * 0.3;
 
-    // Section 156(1) / 87A: resident rebate up to ₹12,500 where total income ≤ ₹5L.
+    // Section 156(1) / 87A: resident rebate up to ?12,500 where total income = ?5L.
 
-    // Super seniors (80+) have no rebate since their exemption already covers ₹5L.
+    // Super seniors (80+) have no rebate since their exemption already covers ?5L.
 
     if (rebateEligible && !isSuperSenior && totalIncome <= 500_000)
       tax = Math.max(0, tax - Math.min(tax, 12_500));
@@ -177,7 +177,7 @@ const calcTax = (
       tax = 200_000 + (taxableIncome - 2_000_000) * 0.25;
     else tax = 300_000 + (taxableIncome - 2_400_000) * 0.3;
 
-    // Section 156(2): rebate up to ₹60,000 for total income ≤ ₹12L; marginal relief above.
+    // Section 156(2): rebate up to ?60,000 for total income = ?12L; marginal relief above.
 
     if (rebateEligible && totalIncome <= 1_200_000)
       tax = Math.max(0, tax - Math.min(tax, 60_000));
@@ -188,7 +188,7 @@ const calcTax = (
   return Math.round(tax * 1.04); // +4% health & education cess
 };
 
-/* ─── Salary entry factory (module-level) ─── */
+/* --- Salary entry factory (module-level) --- */
 
 let nextSalaryEntryId = 0;
 
@@ -245,7 +245,7 @@ const newSalaryEntry = () => ({
   salaryPastYears89A: "",
 });
 
-/* ─── Salary total (module-level, pure) ─── */
+/* --- Salary total (module-level, pure) --- */
 
 const getSalaryTotal = (entry, applyExemptions = true) => {
   const breakupFilled =
@@ -293,7 +293,7 @@ const getSalaryTotal = (entry, applyExemptions = true) => {
   return s171 + s172 + s173 - exemptions;
 };
 
-/* ─── Step definitions ─── */
+/* --- Step definitions --- */
 
 const STEPS = [
   { id: 0, label: "Personal Info" },
@@ -302,10 +302,12 @@ const STEPS = [
 
   { id: 2, label: "Deductions & Relief" },
 
-  { id: 3, label: "Tax Summary" },
+  { id: 3, label: "Taxes Paid" },
+
+  { id: 4, label: "Tax Summary" },
 ];
 
-/* ─── Sub-section definitions per step ─── */
+/* --- Sub-section definitions per step --- */
 const SUB_SECTIONS = {
   0: [
     { id: "personal-info",        label: "Personal Info" },
@@ -320,7 +322,7 @@ const SUB_SECTIONS = {
     { id: "capital-gains",        label: "Capital Gains" },
     { id: "other-income",         label: "Other Income" },
     { id: "exempt-income",        label: "Exempt & Gaming" },
-    { id: "taxes-paid",           label: "Taxes Paid" },
+    // { id: "taxes-paid",           label: "Taxes Paid" },
   ],
   2: [
     { id: "deductions-relief",    label: "Deductions & Relief" },
@@ -328,10 +330,13 @@ const SUB_SECTIONS = {
     { id: "both-regime",          label: "NPS (Both Regimes)" },
     { id: "tax-savings",          label: "Tax Savings (Old)" },
   ],
-  3: [],
+  3: [
+    { id: "taxes-paid",           label: "Taxes Paid" },
+  ],
+  4: [],
 };
 
-/* ─── Field helper components ─── */
+/* --- Field helper components --- */
 
 const FloatingInput = ({
   label,
@@ -459,7 +464,7 @@ const FloatingSelect = ({
   </div>
 );
 
-/* ─── Inline ₹ currency input ─── */
+/* --- Inline ? currency input --- */
 
 const CurrencyInput = ({
   value,
@@ -471,7 +476,7 @@ const CurrencyInput = ({
   <div
     className={`flex items-center gap-1 border border-slate-300 rounded-lg px-3 py-2 bg-white flex-shrink-0 ${width} ${className}`}
   >
-    <span className="text-slate-400 text-sm flex-shrink-0">₹</span>
+    <span className="text-slate-400 text-sm flex-shrink-0">?</span>
 
     <input
       type="number"
@@ -485,7 +490,136 @@ const CurrencyInput = ({
   </div>
 );
 
-/* ─── Collapsible card section ─── */
+/* --- Collapsible card section --- */
+
+/* --- Multi-Select Dropdown Component --- */
+const MultiSelectDropdown = ({ options, selectedValues, onChange, placeholder = "Select options..." }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const wrapperRef = useRef(null);
+
+  const filteredOptions = options.filter(opt =>
+    opt.label.toLowerCase().includes(searchText.toLowerCase()) ||
+    (opt.description || "").toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  const handleToggle = (value) => {
+    const updated = selectedValues.includes(value)
+      ? selectedValues.filter(v => v !== value)
+      : [...selectedValues, value];
+    onChange(updated);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedCount = selectedValues.length;
+
+  return (
+    <div ref={wrapperRef} style={{ position: "relative" }}>
+      {/* Trigger button */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(o => !o)}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "10px 12px",
+          border: isOpen ? "2px solid #3b82f6" : "1px solid #cbd5e1",
+          borderRadius: "8px",
+          background: "#fff",
+          cursor: "pointer",
+          fontSize: "13px",
+          fontWeight: 500,
+          color: selectedCount > 0 ? "#1e293b" : "#94a3b8",
+        }}
+      >
+        <span>{selectedCount > 0 ? `${selectedCount} type${selectedCount > 1 ? "s" : ""} selected` : placeholder}</span>
+        <ChevronDown size={15} style={{ color: "#94a3b8", transform: isOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
+      </button>
+
+      {/* Dropdown menu — rendered inline, below the button */}
+      {isOpen && (
+        <div style={{
+          position: "absolute",
+          top: "calc(100% + 4px)",
+          left: 0,
+          right: 0,
+          zIndex: 9999,
+          background: "#fff",
+          border: "1px solid #cbd5e1",
+          borderRadius: "8px",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+        }}>
+          {/* Search */}
+          <div style={{ padding: "8px", borderBottom: "1px solid #f1f5f9" }}>
+            <input
+              type="text"
+              autoFocus
+              placeholder="Search..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{
+                width: "100%",
+                border: "1px solid #e2e8f0",
+                borderRadius: "6px",
+                padding: "6px 10px",
+                fontSize: "13px",
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+          {/* List */}
+          <div style={{ maxHeight: "220px", overflowY: "auto" }}>
+            {filteredOptions.length === 0 ? (
+              <div style={{ padding: "12px", textAlign: "center", fontSize: "13px", color: "#94a3b8" }}>
+                No options found
+              </div>
+            ) : filteredOptions.map(opt => (
+              <label
+                key={opt.value}
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "10px",
+                  padding: "9px 12px",
+                  cursor: "pointer",
+                  borderBottom: "1px solid #f8fafc",
+                  background: selectedValues.includes(opt.value) ? "#eff6ff" : "#fff",
+                }}
+                onMouseEnter={e => { if (!selectedValues.includes(opt.value)) e.currentTarget.style.background = "#f8fafc"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = selectedValues.includes(opt.value) ? "#eff6ff" : "#fff"; }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedValues.includes(opt.value)}
+                  onChange={() => handleToggle(opt.value)}
+                  style={{ marginTop: "2px", flexShrink: 0, accentColor: "#3b82f6", width: "15px", height: "15px" }}
+                />
+                <div>
+                  <div style={{ fontSize: "13px", fontWeight: 500, color: "#1e293b" }}>{opt.label}</div>
+                  {opt.description && (
+                    <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "1px" }}>{opt.description}</div>
+                  )}
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const FormSection = ({
   icon,
@@ -495,11 +629,15 @@ const FormSection = ({
   children,
   defaultOpen = true,
   sectionId,
+  activeSection,
 }) => {
   const [open, setOpen] = useState(defaultOpen);
 
+  // Only render if activeSection matches or not provided
+  const shouldRender = !activeSection || activeSection === sectionId;
+
   return (
-    <div id={sectionId} className="border border-slate-200 rounded-2xl mb-5 overflow-hidden shadow-sm scroll-mt-24">
+    <div id={sectionId} className="border border-slate-200 rounded-2xl mb-5 shadow-sm scroll-mt-24" style={{ overflow: "visible", display: shouldRender ? "block" : "none" }}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
@@ -535,7 +673,7 @@ const FormSection = ({
       </button>
 
       {open && (
-        <div className="px-6 pb-6 pt-1 bg-white border-t border-slate-100">
+        <div className="overflow-hidden px-6 pb-6 pt-1 bg-white border-t border-slate-100">
           {children}
         </div>
       )}
@@ -543,7 +681,7 @@ const FormSection = ({
   );
 };
 
-/* ─── Residential Status Modal ─── */
+/* --- Residential Status Modal --- */
 
 const ResidentialStatusModal = ({ onClose, onConfirm, initialData }) => {
   const [phase, setPhase] = useState(initialData?.status ? "result" : "form");
@@ -564,7 +702,7 @@ const ResidentialStatusModal = ({ onClose, onConfirm, initialData }) => {
       : [{ country: "", tin: "" }],
   );
 
-  // RNOR: Indian Resident but was NRI for ≥ 9 of last 10 years, OR < 730 days in last 7 years
+  // RNOR: Indian Resident but was NRI for = 9 of last 10 years, OR < 730 days in last 7 years
 
   const computeStatus = () => {
     const curr = parseInt(daysCurrentFY) || 0;
@@ -856,9 +994,9 @@ const ResidentialStatusModal = ({ onClose, onConfirm, initialData }) => {
   );
 };
 
-/* ─── Step progress bar ─── */
+/* --- Step progress bar --- */
 
-/* ─── Step progress bar — vertical sidebar ─── */
+/* --- Step progress bar � vertical sidebar --- */
 const StepBar = ({ current, completedSteps = new Set(), onStepClick }) => (
   <div className="flex flex-col w-64 flex-shrink-0">
     {/* Header */}
@@ -911,7 +1049,7 @@ const StepBar = ({ current, completedSteps = new Set(), onStepClick }) => (
             <p className={`text-xs mt-0.5 transition-colors
               ${active ? "text-blue-600 font-semibold" : done ? "text-emerald-500" : "text-slate-300 group-hover:text-slate-400"}
             `}>
-              {done ? "✓ Completed" : active ? "In progress" : "Not started"}
+              {done ? "? Completed" : active ? "In progress" : "Not started"}
             </p>
           </button>
         </div>
@@ -920,7 +1058,7 @@ const StepBar = ({ current, completedSteps = new Set(), onStepClick }) => (
   </div>
 );
 
-/* ─── Tax Summary row ─── */
+/* --- Tax Summary row --- */
 
 const SummaryRow = ({ label, value, highlight, bold }) => (
   <div
@@ -940,11 +1078,10 @@ const SummaryRow = ({ label, value, highlight, bold }) => (
   </div>
 );
 
-/* ─── Exempt Allowances section (HRA + LTA) ─── */
+/* --- Exempt Allowances section (HRA + LTA) --- */
 
 const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
   const [open, setOpen] = useState(true);
-  const [expandMore, setExpandMore] = useState(false);
 
   const allowances = [
     { label: "HRA Exemption", field: "hraExemption", description: "House Rent Allowance exemption u/s 10(5)" },
@@ -974,16 +1111,20 @@ const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
     { label: "Sec 10(17)", field: "sec10_17_mp", description: "Allowance MP/MLA/MLC" },
   ];
 
-  const hraExempt = toNum(entry.hraExemption);
-  const ltaExempt = toNum(entry.ltaExemption);
-  const otherExempt = allowances.slice(2).reduce((sum, a) => sum + toNum(entry[a.field]), 0);
-  const total = hraExempt + ltaExempt + otherExempt;
+  // Always show HRA + LTA; extra ones from dropdown selection
+  const fixedFields = ["hraExemption", "ltaExemption"];
+  const selectedExtras = entry.selectedAllowances || [];
+  const visibleAllowances = allowances.filter(
+    a => fixedFields.includes(a.field) || selectedExtras.includes(a.field)
+  );
+  const dropdownOptions = allowances
+    .filter(a => !fixedFields.includes(a.field))
+    .map(a => ({ value: a.field, label: a.label, description: a.description }));
 
-  // Show first 2 (HRA + LTA) by default, rest when expanded
-  const visibleAllowances = expandMore ? allowances : allowances.slice(0, 2);
+  const total = allowances.reduce((sum, a) => sum + toNum(entry[a.field]), 0);
 
   return (
-    <div className="border border-slate-200 rounded-xl overflow-hidden">
+    <div className="border border-slate-200 rounded-xl">
       {/* Section header */}
       <button
         type="button"
@@ -994,19 +1135,16 @@ const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
           <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
             <span className="text-blue-600 font-black text-xs">2</span>
           </div>
-
           <div className="text-left">
             <span className="text-sm font-bold text-slate-800">
               2. Exempt allowances like HRA, LTA etc.
             </span>
           </div>
         </div>
-
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold text-slate-800">
-            ₹ {total.toLocaleString("en-IN")}
+            ₹{total.toLocaleString("en-IN")}
           </span>
-
           {open ? (
             <ChevronUp size={16} className="text-slate-400" />
           ) : (
@@ -1017,10 +1155,10 @@ const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
 
       {open && (
         <div className="border-t border-slate-100 px-4 py-4 bg-white space-y-4">
+          {/* Render all visible allowance rows */}
           {visibleAllowances.map((allowance, index) => (
             <div key={allowance.field}>
               {index > 0 && <div className="border-t border-slate-100 pt-4" />}
-              
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex-1">
@@ -1031,7 +1169,6 @@ const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
                       {allowance.description}
                     </p>
                   </div>
-
                   <CurrencyInput
                     value={entry[allowance.field]}
                     onChange={(e) =>
@@ -1040,7 +1177,6 @@ const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
                     width="w-44"
                   />
                 </div>
-
                 {allowance.field === "hraExemption" && (
                   <button
                     type="button"
@@ -1051,37 +1187,27 @@ const ExemptAllowances = ({ entry, updateSalaryEntry, onOpenHRA }) => {
                     Add HRA Exemption
                   </button>
                 )}
+                {/* Dropdown appears right after LTA row */}
+                {allowance.field === "ltaExemption" && (
+                  <div className="pt-2">
+                    <MultiSelectDropdown
+                      options={dropdownOptions}
+                      selectedValues={selectedExtras}
+                      onChange={(selected) => updateSalaryEntry(entry.id, "selectedAllowances", selected)}
+                      placeholder={`Add more allowances (${dropdownOptions.length} available)`}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}
-
-          {!expandMore && allowances.length > 2 && (
-            <button
-              type="button"
-              onClick={() => setExpandMore(true)}
-              className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 pt-2"
-            >
-              <Plus size={11} className="border border-blue-600 rounded-full" />
-              Add more allowances ({allowances.length - 2} more available)
-            </button>
-          )}
-
-          {expandMore && allowances.length > 2 && (
-            <button
-              type="button"
-              onClick={() => setExpandMore(false)}
-              className="text-xs font-semibold text-slate-600 hover:text-slate-700 flex items-center gap-1 pt-2"
-            >
-              Show Less
-            </button>
-          )}
         </div>
       )}
     </div>
   );
 };
 
-/* ─── HRA Exemption Modal ─── */
+/* --- HRA Exemption Modal --- */
 
 const HRAExemptionModal = ({ entry, onClose, onSave }) => {
   const [metroCity, setMetroCity] = useState(entry.metroCity || false);
@@ -1149,7 +1275,7 @@ const HRAExemptionModal = ({ entry, onClose, onSave }) => {
             <span className="text-sm font-semibold text-slate-700">
               Total HRA Exemption:{" "}
               <span className="text-slate-900 font-bold">
-                ₹{" "}
+                ?{" "}
                 {(parseFloat(hraExemption) || autoCalc).toLocaleString("en-IN")}
               </span>
             </span>
@@ -1257,17 +1383,9 @@ const HRAExemptionModal = ({ entry, onClose, onSave }) => {
             </div>
           </div>
 
-          {/* Footer links */}
+          {/* Action buttons */}
 
-          <div className="flex items-center gap-4 text-sm font-semibold text-blue-600">
-            <button type="button" className="hover:text-blue-700" onClick={onOpenHRA}>
-              Add HRA Exemption
-            </button>
-          </div>
         </div>
-
-        {/* Action buttons */}
-
         <div className="px-5 py-4 border-t border-slate-100 flex items-center justify-end gap-3">
           <button
             type="button"
@@ -1290,7 +1408,7 @@ const HRAExemptionModal = ({ entry, onClose, onSave }) => {
   );
 };
 
-/* ─── Other Salary Components (collapsible) ─── */
+/* --- Other Salary Components (collapsible) --- */
 
 const OtherSalaryComponents = ({ entry, updateSalaryEntry }) => {
   const [open, setOpen] = useState(true); // open by default to match screenshot
@@ -1364,14 +1482,14 @@ const OtherSalaryComponents = ({ entry, updateSalaryEntry }) => {
           </p>
 
           <p className="text-xs text-slate-500 mt-0.5">
-            Perks &amp; extra salary (ESOPs, settlement, etc.) — enter only if
+            Perks &amp; extra salary (ESOPs, settlement, etc.) � enter only if
             applicable
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <span className="text-sm font-bold text-slate-700">
-            ₹ {total.toLocaleString("en-IN")}
+            ? {total.toLocaleString("en-IN")}
           </span>
 
           {open ? (
@@ -1397,7 +1515,7 @@ const OtherSalaryComponents = ({ entry, updateSalaryEntry }) => {
                 <p className="text-sm text-slate-700">{label}</p>
               </div>
 
-              {/* ₹ input */}
+              {/* ? input */}
 
               <CurrencyInput
                 value={entry[field] ?? ""}
@@ -1426,15 +1544,15 @@ const OtherSalaryComponents = ({ entry, updateSalaryEntry }) => {
   );
 };
 
-/* ══════════════════════════════════════════
+/* ------------------------------------------
 
-   QUICK CALC — floating dev/test panel
+   QUICK CALC � floating dev/test panel
 
    Toggle with the calculator button (bottom-right).
 
    Completely independent of the main form state.
 
-══════════════════════════════════════════ */
+------------------------------------------ */
 
 const QC_DEFAULTS = {
   regime: "new",
@@ -1462,11 +1580,11 @@ const QC_DEFAULTS = {
   ltcgEquity: "",
 };
 
-/* ══════════════════════════════════════════
+/* ------------------------------------------
 
    HOUSE PROPERTY SECTION
 
-══════════════════════════════════════════ */
+------------------------------------------ */
 
 let nextPropId = 0;
 
@@ -1613,7 +1731,7 @@ const HousePropertySection = ({ income, setIncome, personal }) => {
         <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">
-              🏠
+              ??
             </div>
 
             <div>
@@ -1657,7 +1775,7 @@ const HousePropertySection = ({ income, setIncome, personal }) => {
         <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-lg">
-              🏠
+              ??
             </div>
 
             <div>
@@ -1886,7 +2004,7 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
           <div className="border border-slate-200 rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
-                <span className="text-base">👤</span>
+                <span className="text-base">??</span>
 
                 <p className="text-sm font-bold text-slate-800">
                   Owner Details
@@ -2034,12 +2152,12 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
             )}
           </div>
 
-          {/* Tenant Details — let-out only */}
+          {/* Tenant Details � let-out only */}
 
           {isLetOut && (
             <div className="border border-slate-200 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-base">🏢</span>
+                <span className="text-base">??</span>
 
                 <p className="text-sm font-bold text-slate-800">
                   Tenant Details
@@ -2115,12 +2233,12 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
             </div>
           )}
 
-          {/* Rental Income — let-out only */}
+          {/* Rental Income � let-out only */}
 
           {isLetOut && (
             <div className="border border-slate-200 rounded-xl p-4 space-y-3">
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-base">📋</span>
+                <span className="text-base">??</span>
 
                 <p className="text-sm font-bold text-slate-800">
                   1. Rental Income and Property Tax Details
@@ -2161,7 +2279,7 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
                 <div>
                   <p className="text-sm text-slate-700">
                     C. Standard Deduction u/s 24a{" "}
-                    <span className="text-slate-400">(30% of (A − B))</span>
+                    <span className="text-slate-400">(30% of (A - B))</span>
                   </p>
 
                   <p className="text-xs text-slate-400">
@@ -2170,7 +2288,7 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
                 </div>
 
                 <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 w-44">
-                  <span className="text-slate-400 text-sm">₹</span>
+                  <span className="text-slate-400 text-sm">?</span>
 
                   <span className="flex-1 text-sm font-semibold text-slate-600 text-right">
                     {stdDed.toLocaleString("en-IN")}
@@ -2183,7 +2301,7 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
                   <p className="text-sm font-semibold text-slate-800">
                     Net Income{" "}
                     <span className="text-slate-400 font-normal">
-                      (A − B − C − Loan)
+                      (A - B - C - Loan)
                     </span>
                   </p>
 
@@ -2193,7 +2311,7 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
                 </div>
 
                 <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-3 py-2 bg-slate-50 w-44">
-                  <span className="text-slate-400 text-sm">₹</span>
+                  <span className="text-slate-400 text-sm">?</span>
 
                   <span
                     className={`flex-1 text-sm font-semibold text-right ${netIncome < 0 ? "text-red-600" : "text-slate-600"}`}
@@ -2210,7 +2328,7 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
           <div className="border border-slate-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-base">🏦</span>
+                <span className="text-base">??</span>
 
                 <p className="text-sm font-bold text-slate-800">
                   Home Loan Details
@@ -2238,14 +2356,14 @@ const PropCard = ({ prop, type, onUpdate, onRemove, personal }) => {
                     </span>
 
                     <span className="text-slate-600">
-                      Deduction: ₹
+                      Deduction: ?
                       {toNum(prop.homeLoanDeduction).toLocaleString("en-IN")}
                     </span>
                   </div>
                 ))}
 
                 <p className="text-xs text-slate-500 mt-1">
-                  Maximum deduction claimable in a FY is ₹2,00,000{" "}
+                  Maximum deduction claimable in a FY is ?2,00,000{" "}
                   {isLetOut ? "(uncapped for let-out)" : ""}
                 </p>
               </div>
@@ -2358,7 +2476,7 @@ const HomeLoanModal = ({ prop, onClose, onSave }) => {
 
                   <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-blue-500">🔄</span>
+                      <span className="text-blue-500">??</span>
 
                       <span className="text-xs text-blue-700 font-semibold">
                         Upload your Loan Interest Certificate to fetch details
@@ -2426,7 +2544,7 @@ const HomeLoanModal = ({ prop, onClose, onSave }) => {
                     />
 
                     <FloatingInput
-                      label="Total Loan Amount (₹)"
+                      label="Total Loan Amount (?)"
                       type="number"
                       onWheel={(e) => e.target.blur()}
                       value={loan.loanAmount}
@@ -2436,7 +2554,7 @@ const HomeLoanModal = ({ prop, onClose, onSave }) => {
                     />
 
                     <FloatingInput
-                      label="Loan Outstanding (₹)"
+                      label="Loan Outstanding (?)"
                       type="number"
                       onWheel={(e) => e.target.blur()}
                       value={loan.loanOutstanding}
@@ -2449,7 +2567,7 @@ const HomeLoanModal = ({ prop, onClose, onSave }) => {
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <FloatingInput
-                        label="A. Interest before construction (₹)"
+                        label="A. Interest before construction (?)"
                         type="number"
                         onWheel={(e) => e.target.blur()}
                         value={loan.preConstructionInterest}
@@ -2463,7 +2581,7 @@ const HomeLoanModal = ({ prop, onClose, onSave }) => {
                     </div>
 
                     <FloatingInput
-                      label="B. Interest after construction (₹)"
+                      label="B. Interest after construction (?)"
                       type="number"
                       onWheel={(e) => e.target.blur()}
                       value={loan.postConstructionInterest}
@@ -2483,7 +2601,7 @@ const HomeLoanModal = ({ prop, onClose, onSave }) => {
                       </label>
 
                       <div className="flex items-center gap-1 border border-slate-200 rounded-lg px-3 py-2.5 bg-slate-50">
-                        <span className="text-slate-400 text-sm">₹</span>
+                        <span className="text-slate-400 text-sm">?</span>
 
                         <span className="flex-1 text-sm font-semibold text-slate-700 text-right">
                           {ded.toLocaleString("en-IN")}
@@ -2511,12 +2629,12 @@ const HomeLoanModal = ({ prop, onClose, onSave }) => {
             <p className="text-sm font-bold text-slate-800">
               Total Deduction:{" "}
               <span className="text-blue-700">
-                ₹{totalDeduction.toLocaleString("en-IN")}
+                ?{totalDeduction.toLocaleString("en-IN")}
               </span>
             </p>
 
             <p className="text-xs text-slate-400">
-              Maximum deduction claimable in a FY is ₹2,00,000
+              Maximum deduction claimable in a FY is ?2,00,000
             </p>
           </div>
 
@@ -2550,7 +2668,7 @@ const QuickCalc = () => {
 
   const isResident = true; // quick calc always assumes resident
 
-  // ── compute ──
+  // -- compute --
 
   const salary = n("grossSalary");
 
@@ -2651,7 +2769,7 @@ const QuickCalc = () => {
       : []),
 
     {
-      l: `✅ Tax — ${q.regime === "new" ? "New" : "Old"} Regime`,
+      l: `? Tax � ${q.regime === "new" ? "New" : "Old"} Regime`,
       v: fmt(display),
       highlight: true,
     },
@@ -2753,7 +2871,7 @@ const QuickCalc = () => {
                 >
                   <option value="general">General (&lt;60)</option>
 
-                  <option value="senior">Senior (60—79)</option>
+                  <option value="senior">Senior (60�79)</option>
 
                   <option value="superSenior">Super Sr (80+)</option>
                 </select>
@@ -2777,7 +2895,7 @@ const QuickCalc = () => {
               <QInput
                 label="Std Deduction override"
                 fieldKey="stdDeduction"
-                hint={`Leave blank = auto (₹${autoStd.toLocaleString("en-IN")})`}
+                hint={`Leave blank = auto (?${autoStd.toLocaleString("en-IN")})`}
                 q={q}
                 set={set}
               />
@@ -2785,34 +2903,34 @@ const QuickCalc = () => {
               <QInput
                 label="Home Loan Interest (self-occ)"
                 fieldKey="homeLoanInterest"
-                hint="Old regime: capped ₹2L; not applied in new"
+                hint="Old regime: capped ?2L; not applied in new"
                 q={q}
                 set={set}
               />
 
               <QInput
-                label="Other Income (FD, dividends…)"
+                label="Other Income (FD, dividends�)"
                 fieldKey="otherIncome"
                 q={q}
                 set={set}
               />
 
               <QInput
-                label="STCG — Equity (20%)"
+                label="STCG � Equity (20%)"
                 fieldKey="stcgEquity"
                 q={q}
                 set={set}
               />
 
               <QInput
-                label="LTCG — Equity (12.5%, above ₹1.25L)"
+                label="LTCG � Equity (12.5%, above ?1.25L)"
                 fieldKey="ltcgEquity"
                 q={q}
                 set={set}
               />
             </div>
 
-            {/* Old-regime deduction inputs — only shown for old regime */}
+            {/* Old-regime deduction inputs � only shown for old regime */}
 
             {q.regime === "old" && (
               <div className="space-y-2.5">
@@ -2821,28 +2939,28 @@ const QuickCalc = () => {
                 </p>
 
                 <QInput
-                  label="80C (max ₹1.5L)"
+                  label="80C (max ?1.5L)"
                   fieldKey="sec80C"
                   q={q}
                   set={set}
                 />
 
                 <QInput
-                  label="80D (max ₹50K shown)"
+                  label="80D (max ?50K shown)"
                   fieldKey="sec80D"
                   q={q}
                   set={set}
                 />
 
                 <QInput
-                  label="NPS 80CCD(1B) (max ₹50K)"
+                  label="NPS 80CCD(1B) (max ?50K)"
                   fieldKey="nps"
                   q={q}
                   set={set}
                 />
 
                 <QInput
-                  label="80EEA Home Loan (max ₹1.5L)"
+                  label="80EEA Home Loan (max ?1.5L)"
                   fieldKey="sec80EEA"
                   q={q}
                   set={set}
@@ -2882,13 +3000,13 @@ const QuickCalc = () => {
   );
 };
 
-/* ══════════════════════════════════════════
+/* ------------------------------------------
 
-   TEST DATA — fill the whole form in one click
+   TEST DATA � fill the whole form in one click
 
    Only visible when import.meta.env.DEV === true
 
-══════════════════════════════════════════ */
+------------------------------------------ */
 
 const INCOME_DEFAULTS = {
   hasSalary: false,
@@ -2933,7 +3051,7 @@ const INCOME_DEFAULTS = {
 
 const TEST_SCENARIOS = [
   {
-    label: "Salaried — New Regime",
+    label: "Salaried � New Regime",
 
     personal: {
       firstName: "Ravi",
@@ -3017,7 +3135,7 @@ const TEST_SCENARIOS = [
   },
 
   {
-    label: "Salaried — Old Regime",
+    label: "Salaried � Old Regime",
 
     personal: {
       firstName: "Priya",
@@ -3114,7 +3232,7 @@ const TEST_SCENARIOS = [
   },
 
   {
-    label: "Senior Citizen — Old Regime",
+    label: "Senior Citizen � Old Regime",
 
     personal: {
       firstName: "Suresh",
@@ -3150,7 +3268,7 @@ const TEST_SCENARIOS = [
     ],
 
     salaryEntry: {
-      employerName: "Retired — Pension",
+      employerName: "Retired � Pension",
       employerTAN: "",
       grossSalary17: "600000",
       basicPay: "",
@@ -3208,11 +3326,11 @@ const TEST_SCENARIOS = [
   },
 ];
 
-/* ══════════════════════════════════════════
+/* ------------------------------------------
 
    MAIN COMPONENT
 
-/* ─── Deduction Card — collapsible card for old-regime deduction groups ─── */
+/* --- Deduction Card � collapsible card for old-regime deduction groups --- */
 const DeductionCard = ({ emoji, title, subtitle, total, children }) => {
   const [open, setOpen] = useState(false);
   const hasValue = total > 0;
@@ -3233,7 +3351,7 @@ const DeductionCard = ({ emoji, title, subtitle, total, children }) => {
           </div>
         </div>
         <div className="flex items-center gap-3 ml-4 flex-shrink-0">
-          {hasValue && <span className="text-sm font-bold text-emerald-600">- ₹{total.toLocaleString("en-IN")}</span>}
+          {hasValue && <span className="text-sm font-bold text-emerald-600">- ?{total.toLocaleString("en-IN")}</span>}
           {open ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
         </div>
       </button>
@@ -3246,8 +3364,9 @@ const DeductionCard = ({ emoji, title, subtitle, total, children }) => {
   );
 };
 
-/* ─── Step 0: Personal Info ─── */
+/* --- Step 0: Personal Info --- */
 const Step0PersonalInfo = ({
+  activeSection,
   personal,
   handlePersonal,
   errors,
@@ -3263,7 +3382,7 @@ const Step0PersonalInfo = ({
   <div>
     {/* Permanent Information */}
     <FormSection
-      sectionId="personal-info"
+      activeSection={activeSection} sectionId="personal-info"
       icon={<User size={16} />}
       title="Permanent Information"
       subtitle="Please provide all info as per your government identity documents (PAN, Aadhaar etc.)"
@@ -3366,7 +3485,7 @@ const Step0PersonalInfo = ({
 
     {/* Identification & Contact */}
     <FormSection
-      sectionId="identification"
+      activeSection={activeSection} sectionId="identification"
       icon={
         <CreditCard
           size={16}
@@ -3464,7 +3583,7 @@ const Step0PersonalInfo = ({
 
     {/* Bank Details */}
     <FormSection
-      sectionId="bank-details"
+      activeSection={activeSection} sectionId="bank-details"
       icon={<Building2 size={16} />}
       title="Bank Details"
       subtitle="Provide bank account details. In case of multiple accounts, First account will be selected as eligible for refund. Note: To receive your refund into an account it must be added and verified in the Income Tax portal."
@@ -3487,7 +3606,7 @@ const Step0PersonalInfo = ({
         <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3 mb-2 px-1">
           {[
             "Account Number",
-            "IFSC Code ┘",
+            "IFSC Code +",
             "Bank Name",
             "Account Type",
             "",
@@ -3572,7 +3691,7 @@ const Step0PersonalInfo = ({
 
     {/* Address */}
     <FormSection
-      sectionId="address"
+      activeSection={activeSection} sectionId="address"
       icon={<MapPin size={16} />}
       title="Your Address"
       subtitle="You can provide either your current address or permanent address of residence."
@@ -3661,7 +3780,7 @@ const Step0PersonalInfo = ({
 
     {/* Residential Status */}
     <FormSection
-      sectionId="residential-status"
+      activeSection={activeSection} sectionId="residential-status"
       icon={<UserCircle2 size={16} />}
       title="Residential Status"
       subtitle="The residential status depends on the number of days you stayed in India. Please follow the process to choose the correct residential status."
@@ -3720,8 +3839,9 @@ const Step0PersonalInfo = ({
   </div>
 );
 
-/* ─── Step 1: Income Sources ─── */
+/* --- Step 1: Income Sources --- */
 const Step1IncomeSources = ({
+  activeSection,
   income,
   handleIncome,
   setIncome,
@@ -3740,12 +3860,12 @@ const Step1IncomeSources = ({
     <p className="text-xs text-slate-500 mb-5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center gap-2">
       <Info size={14} className="text-blue-500 flex-shrink-0" />
       Select all income sources that apply. Only fill what's relevant
-      — leave the rest blank.
+      � leave the rest blank.
     </p>
 
     {/* Salary */}
     <FormSection
-      sectionId="salary-income"
+      activeSection={activeSection} sectionId="salary-income"
       icon={<Briefcase size={16} />}
       title="Salary Income"
       subtitle="Add details manually or Upload Form 16 to auto-fill your salary details. You can add salary income from multiple jobs as well."
@@ -3812,11 +3932,11 @@ const Step1IncomeSources = ({
             return (
               <div
                 key={entry.id}
-                className="border border-slate-200 rounded-xl overflow-hidden"
+                className="border border-slate-200 rounded-xl"
               >
-                {/* Collapsed row — click anywhere to toggle */}
+                {/* Collapsed row � click anywhere to toggle */}
                 <div
-                  className="flex items-center justify-between px-4 py-3 bg-slate-50 cursor-pointer select-none hover:bg-slate-100 transition-colors"
+                  className="flex items-center justify-between px-4 py-3 bg-slate-50 cursor-pointer select-none hover:bg-slate-100 transition-colors overflow-hidden"
                   onClick={() => setEditingSalaryId(isEditing ? null : entry.id)}
                 >
                   <span className="text-sm font-semibold text-slate-700 uppercase tracking-wide">
@@ -3825,7 +3945,7 @@ const Step1IncomeSources = ({
                   <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
                     {total > 0 && (
                       <span className="text-sm font-bold text-slate-800">
-                        ₹{total.toLocaleString("en-IN")}
+                        ?{total.toLocaleString("en-IN")}
                       </span>
                     )}
                     <button
@@ -3889,10 +4009,10 @@ const Step1IncomeSources = ({
                           { value: "central_govt",               label: "Central Government" },
                           { value: "state_govt",                 label: "State Government" },
                           { value: "psu",                        label: "Public Sector Undertaking (PSU)" },
-                          { value: "pensioners_central",         label: "Pensioners — Central Govt." },
-                          { value: "pensioners_state",           label: "Pensioners — State Govt." },
-                          { value: "pensioners_psu",             label: "Pensioners — PSU" },
-                          { value: "pensioners_others",          label: "Pensioners — Others" },
+                          { value: "pensioners_central",         label: "Pensioners � Central Govt." },
+                          { value: "pensioners_state",           label: "Pensioners � State Govt." },
+                          { value: "pensioners_psu",             label: "Pensioners � PSU" },
+                          { value: "pensioners_others",          label: "Pensioners � Others" },
                         ]}
                         hint="As per Form 16 Part-B / ITR schedule"
                       />
@@ -3905,13 +4025,13 @@ const Step1IncomeSources = ({
                       </span>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-slate-900">
-                          {total > 0 ? `₹${total.toLocaleString("en-IN")}` : "—"}
+                          {total > 0 ? `?${total.toLocaleString("en-IN")}` : "�"}
                         </span>
                         <ChevronDown size={14} className="text-slate-400" />
                       </div>
                     </div>
 
-                    {/* 1. Gross Salary — 17(1) */}
+                    {/* 1. Gross Salary � 17(1) */}
                     <div className="border border-slate-200 rounded-xl overflow-hidden">
                       {/* Section header */}
                       <div className="flex items-center justify-between px-4 py-3 bg-white">
@@ -3924,11 +4044,11 @@ const Step1IncomeSources = ({
                           </span>
                         </div>
                         <span className="text-sm font-bold text-slate-800">
-                          {s171 > 0 ? `₹${s171.toLocaleString("en-IN")}` : "—"}
+                          {s171 > 0 ? `?${s171.toLocaleString("en-IN")}` : "�"}
                         </span>
                       </div>
 
-                      {/* 17(1) row — single total input + breakup toggle */}
+                      {/* 17(1) row � single total input + breakup toggle */}
                       <div className="border-t border-slate-100 px-4 py-3 bg-white space-y-3">
                         <div className="flex items-center justify-between gap-4">
                           <div className="min-w-0">
@@ -3991,7 +4111,7 @@ const Step1IncomeSources = ({
                                   {label}
                                 </span>
                                 <div className="flex items-center gap-1.5 border border-slate-300 rounded-lg px-3 py-1.5 bg-white w-44 flex-shrink-0">
-                                  <span className="text-slate-400 text-xs flex-shrink-0">₹</span>
+                                  <span className="text-slate-400 text-xs flex-shrink-0">?</span>
                                   <input
                                     type="number"
                                     onWheel={(e) => e.target.blur()}
@@ -4010,7 +4130,7 @@ const Step1IncomeSources = ({
                         </div>
                       </div>
 
-                    {/* 2. Exempt Allowances — HRA, LTA */}
+                    {/* 2. Exempt Allowances � HRA, LTA */}
                     <ExemptAllowances
                       entry={entry}
                       updateSalaryEntry={updateSalaryEntry}
@@ -4018,7 +4138,7 @@ const Step1IncomeSources = ({
                     />
 
                     {/* 3. Perquisites 17(2) */}
-                    <div className="border border-slate-200 rounded-xl overflow-hidden">
+                    <div className="border border-slate-200 rounded-xl">
                       <div className="flex items-center justify-between px-4 py-3 bg-white">
                         <div>
                           <span className="text-sm font-bold text-slate-800">
@@ -4026,13 +4146,42 @@ const Step1IncomeSources = ({
                           </span>
                         </div>
                         <span className="text-sm font-bold text-slate-800">
-                          {s172 > 0 ? `₹${s172.toLocaleString("en-IN")}` : "—"}
+                          {s172 > 0 ? `?${s172.toLocaleString("en-IN")}` : "�"}
                         </span>
                       </div>
                       <div className="border-t border-slate-100 px-4 py-3 bg-white">
                         <p className="text-xs text-slate-500 mb-3">
-                          Value of perquisites under section 17(2) — as per Form No. 12BA, wherever applicable
+                          Value of perquisites under section 17(2) � as per Form No. 12BA, wherever applicable
                         </p>
+
+                        {/* Perquisite Types Dropdown */}
+                        <div className="mb-4 relative">
+                          <MultiSelectDropdown
+                            options={[
+                              { value: "accommodation", label: "1. Accommodation", description: "Rent-free or concessional accommodation u/s 17(2)(i)/(ii)" },
+                              { value: "cars", label: "2. Cars / Other Automotive", description: "Company car or vehicle provided for personal/mixed use" },
+                              { value: "sweeper", label: "3. Sweeper, Gardener, Watchman or Personal Attendant", description: "Domestic servant/attendant provided by employer" },
+                              { value: "gasElecWater", label: "4. Gas, Electricity, Water", description: "Utilities provided free or at concessional rate" },
+                              { value: "interestFreeLoan", label: "5. Interest-Free or Concessional Loans", description: "Loan at below-market interest rate" },
+                              { value: "holidayExpenses", label: "6. Holiday Expenses", description: "Employer-paid holiday/vacation expenses" },
+                              { value: "freeTravel", label: "7. Free or Concessional Travel", description: "Travel facility provided free or at concessional rate" },
+                              { value: "freeMeals", label: "8. Free Meals", description: "Free or subsidised meals provided by employer" },
+                              { value: "freeEducation", label: "9. Free Education", description: "Free or subsidised education for employee/family" },
+                              { value: "giftVoucher", label: "10. Gift, Voucher or Token", description: "Gift or voucher in kind; taxable above ₹5,000/year" },
+                              { value: "creditCard", label: "11. Credit Card Expenses", description: "Employer-paid credit card bills for personal use" },
+                              { value: "clubExpenses", label: "12. Club Expenses", description: "Club membership fees or expenses paid by employer" },
+                              { value: "useMovableAssets", label: "13. Use of Movable Assets", description: "Free use of employer's movable assets (electronics, furniture etc.)" },
+                              { value: "transferAssets", label: "14. Transfer of Movable Assets", description: "Assets transferred by employer to employee at concessional rate" },
+                              { value: "otherBenefit", label: "15. Any Other Benefit / Amenity / Service", description: "Any other fringe benefit or amenity not listed above" },
+                            ]}
+                            selectedValues={entry.selectedPerquisites || []}
+                            onChange={(selected) =>
+                              updateSalaryEntry(entry.id, "selectedPerquisites", selected)
+                            }
+                            placeholder="Select perquisite types received..."
+                          />
+                        </div>
+
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-slate-600">
                             17(2) : Employer perks (car, ESOPs, etc.)
@@ -4057,12 +4206,12 @@ const Step1IncomeSources = ({
                           </span>
                         </div>
                         <span className="text-sm font-bold text-slate-800">
-                          {s173 > 0 ? `₹${s173.toLocaleString("en-IN")}` : "—"}
+                          {s173 > 0 ? `?${s173.toLocaleString("en-IN")}` : "�"}
                         </span>
                       </div>
                       <div className="border-t border-slate-100 px-4 py-3 bg-white">
                         <p className="text-xs text-slate-500 mb-3">
-                          Profits in lieu of salary under section 17(3) — as per Form No. 12BA, wherever applicable
+                          Profits in lieu of salary under section 17(3) � as per Form No. 12BA, wherever applicable
                         </p>
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-slate-600">
@@ -4093,7 +4242,7 @@ const Step1IncomeSources = ({
       )}
     </FormSection>
 
-    {/* HRA Exemption Modal — rendered outside the map */}
+    {/* HRA Exemption Modal � rendered outside the map */}
     {hraModalEntryId &&
       (() => {
         const entry = salaryEntries.find((e) => e.id === hraModalEntryId);
@@ -4112,7 +4261,7 @@ const Step1IncomeSources = ({
 
     {/* House Property */}
     <FormSection
-      sectionId="house-property"
+      activeSection={activeSection} sectionId="house-property"
       icon={<Home size={16} />}
       title="House Property"
       subtitle="Add details if you earned rent from your property or paid interest on home loan"
@@ -4144,7 +4293,7 @@ const Step1IncomeSources = ({
 
     {/* Capital Gains */}
     <FormSection
-      sectionId="capital-gains"
+      activeSection={activeSection} sectionId="capital-gains"
       icon={<TrendingUp size={16} />}
       title="Capital Gains"
       subtitle="Stocks, Mutual Funds, Property, F&O"
@@ -4167,7 +4316,7 @@ const Step1IncomeSources = ({
         <div className="space-y-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
             <FloatingInput
-              label="STCG — listed equity / equity MF (20%)"
+              label="STCG � listed equity / equity MF (20%)"
               name="stcgEquity"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4175,18 +4324,18 @@ const Step1IncomeSources = ({
               onChange={handleIncome}
             />
             <FloatingInput
-              label="LTCG — listed equity / equity MF (12.5%)"
+              label="LTCG � listed equity / equity MF (12.5%)"
               name="ltcgEquity"
               type="number"
               onWheel={(e) => e.target.blur()}
               value={income.ltcgEquity}
               onChange={handleIncome}
-              hint="Aggregate eligible gains above ₹1.25L taxable"
+              hint="Aggregate eligible gains above ?1.25L taxable"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <FloatingInput
-              label="STCG — other assets (slab rate)"
+              label="STCG � other assets (slab rate)"
               name="stcgOther"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4194,7 +4343,7 @@ const Step1IncomeSources = ({
               onChange={handleIncome}
             />
             <FloatingInput
-              label="LTCG — other assets (12.5%)*"
+              label="LTCG � other assets (12.5%)*"
               name="ltcgOther"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4209,7 +4358,7 @@ const Step1IncomeSources = ({
 
     {/* Other income */}
     <FormSection
-      sectionId="other-income"
+      activeSection={activeSection} sectionId="other-income"
       icon={<PiggyBank size={16} />}
       title="Other Income"
       subtitle="Interest, dividends, freelance, gifts etc."
@@ -4232,7 +4381,7 @@ const Step1IncomeSources = ({
         <div className="space-y-4 mt-4">
           <div className="grid grid-cols-2 gap-4">
             <FloatingInput
-              label="Interest — Savings A/c (₹)"
+              label="Interest � Savings A/c (?)"
               name="interestSavings"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4241,7 +4390,7 @@ const Step1IncomeSources = ({
               hint="Banks + Post Office savings accounts"
             />
             <FloatingInput
-              label="Interest — FD / RD (₹)"
+              label="Interest � FD / RD (?)"
               name="interestFD"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4252,7 +4401,7 @@ const Step1IncomeSources = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <FloatingInput
-              label="Interest — P2P Lending (₹)"
+              label="Interest � P2P Lending (?)"
               name="interestP2P"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4261,7 +4410,7 @@ const Step1IncomeSources = ({
               hint="CredMint, 12% Club, LendBox, IndiaP2P etc."
             />
             <FloatingInput
-              label="Interest — Bond Investments (₹)"
+              label="Interest � Bond Investments (?)"
               name="interestBonds"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4272,7 +4421,7 @@ const Step1IncomeSources = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <FloatingInput
-              label="Interest — Provident Fund (₹)"
+              label="Interest � Provident Fund (?)"
               name="interestPF"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4281,7 +4430,7 @@ const Step1IncomeSources = ({
               hint="EPF / RPF interest (taxable portion above threshold)"
             />
             <FloatingInput
-              label="Interest — IT Refund (₹)"
+              label="Interest � IT Refund (?)"
               name="interestITRefund"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4291,7 +4440,7 @@ const Step1IncomeSources = ({
             />
           </div>
           <div className="space-y-3">
-            {/* Dividends — row table */}
+            {/* Dividends � row table */}
             <div className="border border-slate-200 rounded-xl overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 bg-slate-50">
                 <div>
@@ -4303,13 +4452,13 @@ const Step1IncomeSources = ({
                   </p>
                 </div>
                 <span className="text-sm font-bold text-slate-700">
-                  ₹{(income.dividends || []).reduce((s, d) => s + toNum(d.amount), 0).toLocaleString("en-IN")}
+                  ?{(income.dividends || []).reduce((s, d) => s + toNum(d.amount), 0).toLocaleString("en-IN")}
                 </span>
               </div>
               <div className="px-4 py-4 space-y-3">
                 {/* Header row */}
                 <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
-                  {["Narration", "Amount (₹)", "Date of Receipt", ""].map((h) => (
+                  {["Narration", "Amount (?)", "Date of Receipt", ""].map((h) => (
                     <p key={h} className="text-xs font-bold text-slate-600">{h}</p>
                   ))}
                 </div>
@@ -4330,7 +4479,7 @@ const Step1IncomeSources = ({
                       className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     />
                     <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
-                      <span className="text-slate-400 text-sm mr-1">₹</span>
+                      <span className="text-slate-400 text-sm mr-1">?</span>
                       <input
                         type="number"
                         onWheel={(e) => e.target.blur()}
@@ -4393,7 +4542,7 @@ const Step1IncomeSources = ({
               </div>
             </div>
 
-            {/* Any Other Income — source dropdown + amount rows */}
+            {/* Any Other Income � source dropdown + amount rows */}
             <div className="border border-slate-200 rounded-xl overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3 bg-slate-50">
                 <div>
@@ -4403,13 +4552,13 @@ const Step1IncomeSources = ({
                   </p>
                 </div>
                 <span className="text-sm font-bold text-slate-700">
-                  ₹{(income.otherIncome || []).reduce((s, r) => s + toNum(r.amount), 0).toLocaleString("en-IN")}
+                  ?{(income.otherIncome || []).reduce((s, r) => s + toNum(r.amount), 0).toLocaleString("en-IN")}
                 </span>
               </div>
               <div className="px-4 py-4 space-y-3">
                 {(income.otherIncome || []).length > 0 && (
                   <div className="grid grid-cols-[1fr_1fr_auto] gap-3">
-                    {["Source", "Amount (₹)", ""].map((h) => (
+                    {["Source", "Amount (?)", ""].map((h) => (
                       <p key={h} className="text-xs font-bold text-slate-600">{h}</p>
                     ))}
                   </div>
@@ -4428,7 +4577,7 @@ const Step1IncomeSources = ({
                       }
                       className="border border-slate-300 rounded-lg px-3 py-2.5 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 appearance-none"
                     >
-                      <option value="">Select source…</option>
+                      <option value="">Select source�</option>
                       <option value="Family Pension">Family Pension</option>
                       <option value="Commission / Brokerage">Commission / Brokerage</option>
                       <option value="Freelance / Consulting">Freelance / Consulting</option>
@@ -4447,7 +4596,7 @@ const Step1IncomeSources = ({
                       <option value="Others">Others</option>
                     </select>
                     <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
-                      <span className="text-slate-400 text-sm mr-1">₹</span>
+                      <span className="text-slate-400 text-sm mr-1">?</span>
                       <input
                         type="number"
                         onWheel={(e) => e.target.blur()}
@@ -4503,8 +4652,8 @@ const Step1IncomeSources = ({
 
     {/* Exempt, Online Gaming & Other Special Income */}
     <FormSection
-      sectionId="exempt-income"
-      icon={<span className="text-base">🎮</span>}
+      activeSection={activeSection} sectionId="exempt-income"
+      icon={<span className="text-base">??</span>}
       title="Exempt, Online Gaming & Other Income"
       subtitle="Exempt Income, Invoice Discounting, Online Gaming, Puzzles, Lottery Winnings etc."
       badge={income.hasExemptOther ? "Details Added" : undefined}
@@ -4532,16 +4681,16 @@ const Step1IncomeSources = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <FloatingInput
-              label="Online Gaming Winnings (₹)"
+              label="Online Gaming Winnings (?)"
               name="onlineGaming"
               type="number"
               onWheel={(e) => e.target.blur()}
               value={income.onlineGaming}
               onChange={handleIncome}
-              hint="Dream11, MPL, WinZO, Rummy etc. — taxed at 30%"
+              hint="Dream11, MPL, WinZO, Rummy etc. � taxed at 30%"
             />
             <FloatingInput
-              label="Lottery / Puzzle Winnings (₹)"
+              label="Lottery / Puzzle Winnings (?)"
               name="lotteryWinnings"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4552,7 +4701,7 @@ const Step1IncomeSources = ({
           </div>
           <div className="grid grid-cols-2 gap-4">
             <FloatingInput
-              label="Invoice Discounting Income (₹)"
+              label="Invoice Discounting Income (?)"
               name="invoiceDiscounting"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4561,7 +4710,7 @@ const Step1IncomeSources = ({
               hint="Taxed at slab rate"
             />
             <FloatingInput
-              label="Exempt Income (₹)"
+              label="Exempt Income (?)"
               name="exemptIncome"
               type="number"
               onWheel={(e) => e.target.blur()}
@@ -4574,409 +4723,11 @@ const Step1IncomeSources = ({
       )}
     </FormSection>
 
-    {/* Taxes Paid — TDS, TCS, Advance Tax */}
-    <FormSection
-      icon={<CreditCard size={16} />}
-      title="Taxes Paid, TDS and TCS"
-      subtitle="TDS or TCS Payments, Payments for Advance Taxes or Tax due and others. Upload Form 26AS to fetch these details."
-      badge={
-        toNum(income.tdsSalary) +
-          (income.tdsNonSalary || []).reduce((s, t) => s + toNum(t.amount), 0) +
-          (income.tdsProperty || []).reduce((s, t) => s + toNum(t.amount), 0) +
-          (income.selfTaxPayments || []).reduce((s, t) => s + toNum(t.amount), 0) +
-          toNum(income.advanceTax) +
-          toNum(income.tcsPaid) >
-        0
-          ? "Details Added"
-          : undefined
-      }
-      defaultOpen={false}
-    >
-      <div className="mt-4 space-y-3">
-        {/* 1. Self Tax Payments (Challan 280) */}
-        <div className="border border-slate-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
-            <div className="flex items-center gap-3">
-              <span className="text-lg">🧾</span>
-              <div>
-                <p className="text-sm font-bold text-slate-800">
-                  Self Tax Payments{" "}
-                  <span className="text-slate-400 font-normal">(For Tax Due / Advance Tax)</span>
-                </p>
-                <p className="text-xs text-slate-500">
-                  Add details if you have paid directly any taxes to the Govt. (via Challan 280)
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() =>
-                setIncome((p) => ({
-                  ...p,
-                  selfTaxPayments: [
-                    ...(p.selfTaxPayments || []),
-                    { bsrCode: "", challanNo: "", date: "", amount: "", type: "Advance Tax" },
-                  ],
-                }))
-              }
-              className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors"
-            >
-              + Add Details
-            </button>
-          </div>
-          {(income.selfTaxPayments || []).length > 0 && (
-            <div className="px-4 py-4 space-y-3">
-              <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
-                {["BSR Code", "Challan No.", "Date", "Amount (₹)", ""].map((h) => (
-                  <p key={h} className="text-xs font-bold text-slate-600">{h}</p>
-                ))}
-              </div>
-              {income.selfTaxPayments.map((t, i) => (
-                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 items-center">
-                  <input
-                    value={t.bsrCode}
-                    onChange={(e) =>
-                      setIncome((p) => ({
-                        ...p,
-                        selfTaxPayments: p.selfTaxPayments.map((x, idx) =>
-                          idx === i ? { ...x, bsrCode: e.target.value } : x,
-                        ),
-                      }))
-                    }
-                    placeholder="BSR Code"
-                    className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <input
-                    value={t.challanNo}
-                    onChange={(e) =>
-                      setIncome((p) => ({
-                        ...p,
-                        selfTaxPayments: p.selfTaxPayments.map((x, idx) =>
-                          idx === i ? { ...x, challanNo: e.target.value } : x,
-                        ),
-                      }))
-                    }
-                    placeholder="Challan No."
-                    className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <input
-                    type="date"
-                    value={t.date}
-                    onChange={(e) =>
-                      setIncome((p) => ({
-                        ...p,
-                        selfTaxPayments: p.selfTaxPayments.map((x, idx) =>
-                          idx === i ? { ...x, date: e.target.value } : x,
-                        ),
-                      }))
-                    }
-                    className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <div className="flex items-center border border-slate-300 rounded-lg px-2 py-2 bg-white">
-                    <span className="text-slate-400 text-xs mr-1">₹</span>
-                    <input
-                      type="number"
-                      onWheel={(e) => e.target.blur()}
-                      value={t.amount}
-                      onChange={(e) =>
-                        setIncome((p) => ({
-                          ...p,
-                          selfTaxPayments: p.selfTaxPayments.map((x, idx) =>
-                            idx === i ? { ...x, amount: e.target.value } : x,
-                          ),
-                        }))
-                      }
-                      placeholder="0"
-                      className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right w-0 min-w-0"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setIncome((p) => ({
-                        ...p,
-                        selfTaxPayments: p.selfTaxPayments.filter((_, idx) => idx !== i),
-                      }))
-                    }
-                    className="text-red-400 hover:text-red-600 p-1"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* 2. TDS on Salary */}
-        <div className="border border-slate-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
-            <div className="flex items-center gap-3">
-              <span className="text-lg">💰</span>
-              <div>
-                <p className="text-sm font-bold text-slate-800">TDS on Salary</p>
-                <p className="text-xs text-slate-500">
-                  This is TDS deducted from salary, check Salary page for any changes.
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="px-4 py-4">
-            <FloatingInput
-              label="TDS on Salary (₹)"
-              name="tdsSalary"
-              type="number"
-              onWheel={(e) => e.target.blur()}
-              value={income.tdsSalary}
-              onChange={handleIncome}
-              hint="As per Form 16 / Form 26AS — total TDS deducted by employer"
-            />
-          </div>
-        </div>
-
-        {/* 3. Non-Salary TDS */}
-        <div className="border border-slate-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
-            <div className="flex items-center gap-3">
-              <span className="text-lg">📊</span>
-              <div>
-                <p className="text-sm font-bold text-slate-800">Non Salary TDS</p>
-                <p className="text-xs text-slate-500">
-                  Add TDS deducted on interest income, professional or consulting income
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() =>
-                setIncome((p) => ({
-                  ...p,
-                  tdsNonSalary: [
-                    ...(p.tdsNonSalary || []),
-                    { deductorName: "", tan: "", amount: "" },
-                  ],
-                }))
-              }
-              className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors"
-            >
-              + Add Details
-            </button>
-          </div>
-          {(income.tdsNonSalary || []).length > 0 && (
-            <div className="px-4 py-4 space-y-3">
-              <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
-                {["Deductor Name", "TAN", "Amount (₹)", ""].map((h) => (
-                  <p key={h} className="text-xs font-bold text-slate-600">{h}</p>
-                ))}
-              </div>
-              {income.tdsNonSalary.map((t, i) => (
-                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center">
-                  <input
-                    value={t.deductorName}
-                    onChange={(e) =>
-                      setIncome((p) => ({
-                        ...p,
-                        tdsNonSalary: p.tdsNonSalary.map((x, idx) =>
-                          idx === i ? { ...x, deductorName: e.target.value } : x,
-                        ),
-                      }))
-                    }
-                    placeholder="e.g. HDFC Bank"
-                    className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <input
-                    value={t.tan}
-                    onChange={(e) =>
-                      setIncome((p) => ({
-                        ...p,
-                        tdsNonSalary: p.tdsNonSalary.map((x, idx) =>
-                          idx === i ? { ...x, tan: e.target.value.toUpperCase() } : x,
-                        ),
-                      }))
-                    }
-                    placeholder="TAN"
-                    className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
-                    <span className="text-slate-400 text-sm mr-1">₹</span>
-                    <input
-                      type="number"
-                      onWheel={(e) => e.target.blur()}
-                      value={t.amount}
-                      onChange={(e) =>
-                        setIncome((p) => ({
-                          ...p,
-                          tdsNonSalary: p.tdsNonSalary.map((x, idx) =>
-                            idx === i ? { ...x, amount: e.target.value } : x,
-                          ),
-                        }))
-                      }
-                      placeholder="0"
-                      className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setIncome((p) => ({
-                        ...p,
-                        tdsNonSalary: p.tdsNonSalary.filter((_, idx) => idx !== i),
-                      }))
-                    }
-                    className="text-red-400 hover:text-red-600 p-1"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* 4. TDS on Sale/Rent of Property */}
-        <div className="border border-slate-200 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
-            <div className="flex items-center gap-3">
-              <span className="text-lg">🏠</span>
-              <div>
-                <p className="text-sm font-bold text-slate-800">
-                  TDS on Sale / Rent of Immovable Property
-                </p>
-                <p className="text-xs text-slate-500">
-                  Add TDS details if you have sold / rented land, house, property or building etc.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() =>
-                setIncome((p) => ({
-                  ...p,
-                  tdsProperty: [
-                    ...(p.tdsProperty || []),
-                    { deductorName: "", pan: "", amount: "" },
-                  ],
-                }))
-              }
-              className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors"
-            >
-              + Add Details
-            </button>
-          </div>
-          {(income.tdsProperty || []).length > 0 && (
-            <div className="px-4 py-4 space-y-3">
-              <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
-                {["Deductor Name", "PAN of Buyer/Tenant", "Amount (₹)", ""].map((h) => (
-                  <p key={h} className="text-xs font-bold text-slate-600">{h}</p>
-                ))}
-              </div>
-              {income.tdsProperty.map((t, i) => (
-                <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center">
-                  <input
-                    value={t.deductorName}
-                    onChange={(e) =>
-                      setIncome((p) => ({
-                        ...p,
-                        tdsProperty: p.tdsProperty.map((x, idx) =>
-                          idx === i ? { ...x, deductorName: e.target.value } : x,
-                        ),
-                      }))
-                    }
-                    placeholder="Name"
-                    className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <input
-                    value={t.pan}
-                    onChange={(e) =>
-                      setIncome((p) => ({
-                        ...p,
-                        tdsProperty: p.tdsProperty.map((x, idx) =>
-                          idx === i ? { ...x, pan: e.target.value.toUpperCase() } : x,
-                        ),
-                      }))
-                    }
-                    placeholder="PAN"
-                    className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  />
-                  <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
-                    <span className="text-slate-400 text-sm mr-1">₹</span>
-                    <input
-                      type="number"
-                      onWheel={(e) => e.target.blur()}
-                      value={t.amount}
-                      onChange={(e) =>
-                        setIncome((p) => ({
-                          ...p,
-                          tdsProperty: p.tdsProperty.map((x, idx) =>
-                            idx === i ? { ...x, amount: e.target.value } : x,
-                          ),
-                        }))
-                      }
-                      placeholder="0"
-                      className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setIncome((p) => ({
-                        ...p,
-                        tdsProperty: p.tdsProperty.filter((_, idx) => idx !== i),
-                      }))
-                    }
-                    className="text-red-400 hover:text-red-600 p-1"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* TCS + Advance Tax (flat fields) */}
-        <div className="grid grid-cols-2 gap-4 pt-1">
-          <FloatingInput
-            label="Advance Tax Paid (₹)"
-            name="advanceTax"
-            type="number"
-            onWheel={(e) => e.target.blur()}
-            value={income.advanceTax}
-            onChange={handleIncome}
-            hint="Self-assessment / advance tax challan payments"
-          />
-          <FloatingInput
-            label="TCS Collected (₹)"
-            name="tcsPaid"
-            type="number"
-            onWheel={(e) => e.target.blur()}
-            value={income.tcsPaid}
-            onChange={handleIncome}
-            hint="Tax Collected at Source — LRS, car purchase etc."
-          />
-        </div>
-
-        {/* Total */}
-        <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-          <span className="text-sm font-semibold text-slate-700">Total Taxes Paid</span>
-          <span className="text-sm font-bold text-slate-900">
-            {fmt(
-              toNum(income.tdsSalary) +
-                (income.tdsNonSalary || []).reduce((s, t) => s + toNum(t.amount), 0) +
-                (income.tdsProperty || []).reduce((s, t) => s + toNum(t.amount), 0) +
-                (income.selfTaxPayments || []).reduce((s, t) => s + toNum(t.amount), 0) +
-                toNum(income.advanceTax) +
-                toNum(income.tcsPaid),
-            )}
-          </span>
-        </div>
-      </div>
-    </FormSection>
   </div>
 );
 
-/* ─── Step 2: Tax Saving ─── */
-const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) => (
+/* --- Step 2: Tax Saving --- */
+const Step2TaxSaving = ({ activeSection, taxSaving, handleTaxSaving, income, tax, personal }) => (
   <div>
     {/* Regime selector */}
     <div className="mb-5 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
@@ -5023,22 +4774,22 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
     </div>
 
     <FormSection
-      sectionId="deductions-relief"
+      activeSection={activeSection} sectionId="deductions-relief"
       icon={<Calculator size={16} />}
       title="Deductions and Relief"
     >
       <div className="mt-4 space-y-5">
         <section className="space-y-3">
-          <h3 className="text-sm font-bold text-slate-800">3A · Deduction under section 19</h3>
+          <h3 className="text-sm font-bold text-slate-800">3A � Deduction under section 19</h3>
           <div className="flex items-center justify-between gap-4 rounded-lg border border-slate-200 px-4 py-3">
             <div>
               <p className="text-sm text-slate-700">Standard deduction</p>
               <p className="text-xs text-slate-500">
-                Auto-applied: up to ₹75,000 new regime or ₹50,000 old regime, limited to salary.
+                Auto-applied: up to ?75,000 new regime or ?50,000 old regime, limited to salary.
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-lg border border-slate-300 bg-slate-50 px-3 py-2">
-              <span className="text-slate-400">₹</span>
+              <span className="text-slate-400">?</span>
               <span className="w-24 text-right text-sm font-semibold text-slate-700">
                 {tax.stdDeduction.toLocaleString("en-IN")}
               </span>
@@ -5057,7 +4808,7 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
 
         <section className="space-y-3 border-t border-slate-100 pt-4">
           <h3 className="text-sm font-bold text-slate-800">
-            3B · Relief under section 157 (formerly section 89)
+            3B � Relief under section 157 (formerly section 89)
           </h3>
           <FloatingInput
             label="Relief for salary arrears / advance salary"
@@ -5072,7 +4823,7 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
 
         <section className="space-y-3 border-t border-slate-100 pt-4">
           <h3 className="text-sm font-bold text-slate-800">
-            3C · Income claimed under section 158 (formerly section 89A)
+            3C � Income claimed under section 158 (formerly section 89A)
           </h3>
           <FloatingInput
             label="Eligible foreign retirement-account income"
@@ -5088,7 +4839,7 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
     </FormSection>
 
     <FormSection
-      sectionId="tax-rebate"
+      activeSection={activeSection} sectionId="tax-rebate"
       icon={<Info size={16} />}
       title="Tax rebate"
       subtitle="Resident individuals may qualify for a rebate after tax is calculated."
@@ -5096,11 +4847,11 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
       <div className="mt-4 space-y-2 text-sm text-slate-600">
         <p>
           <strong className="text-slate-800">New regime:</strong>{" "}
-          rebate up to ₹60,000 where total income is up to ₹12 lakh; marginal relief may apply just above ₹12 lakh.
+          rebate up to ?60,000 where total income is up to ?12 lakh; marginal relief may apply just above ?12 lakh.
         </p>
         <p>
           <strong className="text-slate-800">Old regime:</strong>{" "}
-          rebate up to ₹12,500 where total income is up to ₹5 lakh.
+          rebate up to ?12,500 where total income is up to ?5 lakh.
         </p>
         <p className="text-xs text-slate-500">
           Rebate is for resident individuals. Tax on special-rate income such as capital gains is calculated separately.
@@ -5110,7 +4861,7 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
     </FormSection>
 
     <FormSection
-      sectionId="both-regime"
+      activeSection={activeSection} sectionId="both-regime"
       icon={<Calculator size={16} />}
       title="Deductions available under both regimes"
       subtitle="Enter the eligible employer contribution shown in your salary or NPS records."
@@ -5130,15 +4881,15 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
 
     {taxSaving.regime === "old" && (
       <FormSection
-        sectionId="tax-savings"
+        activeSection={activeSection} sectionId="tax-savings"
         icon={<Calculator size={16} />}
         title="Tax Savings Deductions"
         subtitle="Invested your earnings to save taxes for AY 2026-2027? Enter relevant fields & save taxes!"
       >
         <div className="mt-4 space-y-3">
-          {/* 1 — Popular Tax Saving Investments */}
+          {/* 1 � Popular Tax Saving Investments */}
           <DeductionCard
-            emoji="🏦"
+            emoji="??"
             title="Popular Tax Saving Investments"
             subtitle="80C, PPF, ELSS, NPS, Savings Bank Interest, Pension, and more"
             total={
@@ -5150,39 +4901,39 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
             }
           >
             <FloatingInput
-              label="Eligible savings: LIC, PPF, ELSS, EPF, tuition fees (max ₹1.5L)"
+              label="Eligible savings: LIC, PPF, ELSS, EPF, tuition fees (max ?1.5L)"
               name="sec80C" type="number" onWheel={(e) => e.target.blur()}
               value={taxSaving.sec80C} onChange={handleTaxSaving}
-              hint="Section 80C — combined cap ₹1,50,000."
+              hint="Section 80C � combined cap ?1,50,000."
             />
             <FloatingInput
-              label="Own NPS contributions (max ₹50,000)"
+              label="Own NPS contributions (max ?50,000)"
               name="nps80CCD" type="number" onWheel={(e) => e.target.blur()}
               value={taxSaving.nps80CCD} onChange={handleTaxSaving}
               hint="Additional deduction u/s 80CCD(1B); old regime only."
             />
             {isSeniorForTaxYear(personal.dob) && personal.residentialStatus !== "Non Resident Indian" ? (
               <FloatingInput
-                label="Senior citizen interest deduction (80TTB, max ₹50,000)"
+                label="Senior citizen interest deduction (80TTB, max ?50,000)"
                 name="sec80TTB" type="number" onWheel={(e) => e.target.blur()}
                 value={taxSaving.sec80TTB} onChange={handleTaxSaving}
-                hint={`Eligible interest currently ₹${(toNum(income.interestSavings) + toNum(income.interestFD) + toNum(income.interestP2P) + toNum(income.interestBonds) + toNum(income.interestPF) + toNum(income.interestITRefund)).toLocaleString("en-IN")}.`}
+                hint={`Eligible interest currently ?${(toNum(income.interestSavings) + toNum(income.interestFD) + toNum(income.interestP2P) + toNum(income.interestBonds) + toNum(income.interestPF) + toNum(income.interestITRefund)).toLocaleString("en-IN")}.`}
               />
             ) : (
               <FloatingInput
-                label="Savings account interest deduction (80TTA, max ₹10,000)"
+                label="Savings account interest deduction (80TTA, max ?10,000)"
                 name="sec80TTA" type="number" onWheel={(e) => e.target.blur()}
                 value={taxSaving.sec80TTA} onChange={handleTaxSaving}
-                hint={`Savings interest currently ₹${toNum(income.interestSavings).toLocaleString("en-IN")}.`}
+                hint={`Savings interest currently ?${toNum(income.interestSavings).toLocaleString("en-IN")}.`}
               />
             )}
           </DeductionCard>
 
-          {/* 2 — Medical Insurance */}
+          {/* 2 � Medical Insurance */}
           <DeductionCard
-            emoji="🏥"
+            emoji="??"
             title="Medical Insurance, Health Check-ups, Disabilities etc."
-            subtitle="Deductions related to 80D — Insurance, Disabilities, Health Checkups, etc."
+            subtitle="Deductions related to 80D � Insurance, Disabilities, Health Checkups, etc."
             total={
               Math.min(toNum(taxSaving.sec80D_self), taxSaving.sec80D_selfSenior ? 50_000 : 25_000) +
               Math.min(toNum(taxSaving.sec80D_parents), taxSaving.sec80D_parentsSenior ? 50_000 : 25_000)
@@ -5191,10 +4942,10 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <FloatingInput
-                  label="Health cover — Self & Family"
+                  label="Health cover � Self & Family"
                   name="sec80D_self" type="number" onWheel={(e) => e.target.blur()}
                   value={taxSaving.sec80D_self} onChange={handleTaxSaving}
-                  hint={`Limit ₹${taxSaving.sec80D_selfSenior ? "50,000" : "25,000"}`}
+                  hint={`Limit ?${taxSaving.sec80D_selfSenior ? "50,000" : "25,000"}`}
                 />
                 <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
                   <input type="checkbox" name="sec80D_selfSenior" checked={taxSaving.sec80D_selfSenior} onChange={handleTaxSaving} className="w-3.5 h-3.5 text-blue-600 rounded" />
@@ -5203,10 +4954,10 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
               </div>
               <div className="space-y-2">
                 <FloatingInput
-                  label="Health cover — Parents"
+                  label="Health cover � Parents"
                   name="sec80D_parents" type="number" onWheel={(e) => e.target.blur()}
                   value={taxSaving.sec80D_parents} onChange={handleTaxSaving}
-                  hint={`Limit ₹${taxSaving.sec80D_parentsSenior ? "50,000" : "25,000"}`}
+                  hint={`Limit ?${taxSaving.sec80D_parentsSenior ? "50,000" : "25,000"}`}
                 />
                 <label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer">
                   <input type="checkbox" name="sec80D_parentsSenior" checked={taxSaving.sec80D_parentsSenior} onChange={handleTaxSaving} className="w-3.5 h-3.5 text-blue-600 rounded" />
@@ -5216,9 +4967,9 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
             </div>
           </DeductionCard>
 
-          {/* 3 — Donations */}
+          {/* 3 � Donations */}
           <DeductionCard
-            emoji="🤝"
+            emoji="??"
             title="Donations / Contributions"
             subtitle="Deductions for donations to charitable orgs., political parties, R&D, etc."
             total={toNum(taxSaving.sec80G)}
@@ -5231,9 +4982,9 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
             />
           </DeductionCard>
 
-          {/* 4 — Loans */}
+          {/* 4 � Loans */}
           <DeductionCard
-            emoji="🏠"
+            emoji="??"
             title="Loans"
             subtitle="Deduction for Educational, Home or Electric Vehicle Loans"
             total={toNum(taxSaving.sec80E) + Math.min(toNum(taxSaving.homeLoan80EEA), 150_000)}
@@ -5242,13 +4993,13 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
               label="Education Loan Interest (80E)"
               name="sec80E" type="number" onWheel={(e) => e.target.blur()}
               value={taxSaving.sec80E} onChange={handleTaxSaving}
-              hint="No monetary cap — full interest on education loan is deductible."
+              hint="No monetary cap � full interest on education loan is deductible."
             />
             <FloatingInput
-              label="Home Loan — First-time buyers (80EEA, max ₹1.5L)"
+              label="Home Loan � First-time buyers (80EEA, max ?1.5L)"
               name="homeLoan80EEA" type="number" onWheel={(e) => e.target.blur()}
               value={taxSaving.homeLoan80EEA} onChange={handleTaxSaving}
-              hint="Max ₹1.5L (enforced); loan sanctioned between 1 Apr 2019 — 31 Mar 2022."
+              hint="Max ?1.5L (enforced); loan sanctioned between 1 Apr 2019 � 31 Mar 2022."
             />
           </DeductionCard>
         </div>
@@ -5257,24 +5008,181 @@ const Step2TaxSaving = ({ taxSaving, handleTaxSaving, income, tax, personal }) =
   </div>
 );
 
-/* ─── Step 3: Tax Summary ─── */
+/* --- Step 3: Taxes Paid --- */
+const Step3TaxesPaymentSection = ({ income, setIncome, handleIncome }) => (
+  <div>
+    <p className="text-xs text-slate-500 mb-5 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center gap-2">
+      <Info size={14} className="text-blue-500 flex-shrink-0" />
+      Enter all taxes paid during the financial year — TDS, TCS, Advance Tax, and Self-Assessed Tax.
+    </p>
+
+    <div className="mt-4 space-y-3">
+      {/* 1. Self Tax Payments (Challan 280) */}
+      <div className="border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-sm font-bold text-slate-800">
+                Self Tax Payments{" "}
+                <span className="text-slate-400 font-normal">(For Tax Due / Advance Tax)</span>
+              </p>
+              <p className="text-xs text-slate-500">
+                Add details if you have paid directly any taxes to the Govt. (via Challan 280)
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              setIncome((p) => ({
+                ...p,
+                selfTaxPayments: [
+                  ...(p.selfTaxPayments || []),
+                  { bsrCode: "", challanNo: "", date: "", amount: "", type: "Advance Tax" },
+                ],
+              }))
+            }
+            className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors"
+          >
+            + Add Details
+          </button>
+        </div>
+        {(income.selfTaxPayments || []).length > 0 && (
+          <div className="px-4 py-4 space-y-3">
+            <div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2">
+              {["BSR Code", "Challan No.", "Date", "Amount (₹)", ""].map((h) => (
+                <p key={h} className="text-xs font-bold text-slate-600">{h}</p>
+              ))}
+            </div>
+            {income.selfTaxPayments.map((t, i) => (
+              <div key={i} className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-2 items-center">
+                <input value={t.bsrCode} onChange={(e) => setIncome((p) => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, bsrCode: e.target.value } : x) }))} placeholder="BSR Code" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <input value={t.challanNo} onChange={(e) => setIncome((p) => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, challanNo: e.target.value } : x) }))} placeholder="Challan No." className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <input type="date" value={t.date} onChange={(e) => setIncome((p) => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, date: e.target.value } : x) }))} className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <div className="flex items-center border border-slate-300 rounded-lg px-2 py-2 bg-white">
+                  <span className="text-slate-400 text-xs mr-1">₹</span>
+                  <input type="number" onWheel={(e) => e.target.blur()} value={t.amount} onChange={(e) => setIncome((p) => ({ ...p, selfTaxPayments: p.selfTaxPayments.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))} placeholder="0" className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right w-0 min-w-0" />
+                </div>
+                <button type="button" onClick={() => setIncome((p) => ({ ...p, selfTaxPayments: p.selfTaxPayments.filter((_, idx) => idx !== i) }))} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 2. TDS on Salary */}
+      <div className="border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+          <div>
+            <p className="text-sm font-bold text-slate-800">TDS on Salary</p>
+            <p className="text-xs text-slate-500">TDS deducted from salary as per Form 16 / Form 26AS</p>
+          </div>
+        </div>
+        <div className="px-4 py-4">
+          <FloatingInput label="TDS on Salary (₹)" name="tdsSalary" type="number" onWheel={(e) => e.target.blur()} value={income.tdsSalary} onChange={handleIncome} hint="Total TDS deducted by employer" />
+        </div>
+      </div>
+
+      {/* 3. Non-Salary TDS */}
+      <div className="border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+          <div>
+            <p className="text-sm font-bold text-slate-800">Non Salary TDS</p>
+            <p className="text-xs text-slate-500">TDS deducted on interest income, professional or consulting income</p>
+          </div>
+          <button type="button" onClick={() => setIncome((p) => ({ ...p, tdsNonSalary: [...(p.tdsNonSalary || []), { deductorName: "", tan: "", amount: "" }] }))} className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">+ Add Details</button>
+        </div>
+        {(income.tdsNonSalary || []).length > 0 && (
+          <div className="px-4 py-4 space-y-3">
+            <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
+              {["Deductor Name", "TAN", "Amount (₹)", ""].map((h) => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+            </div>
+            {income.tdsNonSalary.map((t, i) => (
+              <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center">
+                <input value={t.deductorName} onChange={(e) => setIncome((p) => ({ ...p, tdsNonSalary: p.tdsNonSalary.map((x, idx) => idx === i ? { ...x, deductorName: e.target.value } : x) }))} placeholder="e.g. HDFC Bank" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <input value={t.tan} onChange={(e) => setIncome((p) => ({ ...p, tdsNonSalary: p.tdsNonSalary.map((x, idx) => idx === i ? { ...x, tan: e.target.value.toUpperCase() } : x) }))} placeholder="TAN" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                  <span className="text-slate-400 text-sm mr-1">₹</span>
+                  <input type="number" onWheel={(e) => e.target.blur()} value={t.amount} onChange={(e) => setIncome((p) => ({ ...p, tdsNonSalary: p.tdsNonSalary.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))} placeholder="0" className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right" />
+                </div>
+                <button type="button" onClick={() => setIncome((p) => ({ ...p, tdsNonSalary: p.tdsNonSalary.filter((_, idx) => idx !== i) }))} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 4. TDS on Sale/Rent of Property */}
+      <div className="border border-slate-200 rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3.5 bg-slate-50">
+          <div>
+            <p className="text-sm font-bold text-slate-800">TDS on Sale / Rent of Immovable Property</p>
+            <p className="text-xs text-slate-500">TDS if you sold or rented land, house, property or building</p>
+          </div>
+          <button type="button" onClick={() => setIncome((p) => ({ ...p, tdsProperty: [...(p.tdsProperty || []), { deductorName: "", pan: "", amount: "" }] }))} className="text-xs font-bold text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5 hover:bg-blue-50 transition-colors">+ Add Details</button>
+        </div>
+        {(income.tdsProperty || []).length > 0 && (
+          <div className="px-4 py-4 space-y-3">
+            <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
+              {["Deductor Name", "PAN of Buyer/Tenant", "Amount (₹)", ""].map((h) => <p key={h} className="text-xs font-bold text-slate-600">{h}</p>)}
+            </div>
+            {income.tdsProperty.map((t, i) => (
+              <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 items-center">
+                <input value={t.deductorName} onChange={(e) => setIncome((p) => ({ ...p, tdsProperty: p.tdsProperty.map((x, idx) => idx === i ? { ...x, deductorName: e.target.value } : x) }))} placeholder="Name" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <input value={t.pan} onChange={(e) => setIncome((p) => ({ ...p, tdsProperty: p.tdsProperty.map((x, idx) => idx === i ? { ...x, pan: e.target.value.toUpperCase() } : x) }))} placeholder="PAN" className="border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white">
+                  <span className="text-slate-400 text-sm mr-1">₹</span>
+                  <input type="number" onWheel={(e) => e.target.blur()} value={t.amount} onChange={(e) => setIncome((p) => ({ ...p, tdsProperty: p.tdsProperty.map((x, idx) => idx === i ? { ...x, amount: e.target.value } : x) }))} placeholder="0" className="flex-1 text-sm font-semibold text-slate-800 bg-transparent outline-none text-right" />
+                </div>
+                <button type="button" onClick={() => setIncome((p) => ({ ...p, tdsProperty: p.tdsProperty.filter((_, idx) => idx !== i) }))} className="text-red-400 hover:text-red-600 p-1"><Trash2 size={14} /></button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Advance Tax + TCS */}
+      <div className="grid grid-cols-2 gap-4 pt-1">
+        <FloatingInput label="Advance Tax Paid (₹)" name="advanceTax" type="number" onWheel={(e) => e.target.blur()} value={income.advanceTax} onChange={handleIncome} hint="Self-assessment / advance tax challan payments" />
+        <FloatingInput label="TCS Collected (₹)" name="tcsPaid" type="number" onWheel={(e) => e.target.blur()} value={income.tcsPaid} onChange={handleIncome} hint="Tax Collected at Source — LRS, car purchase etc." />
+      </div>
+
+      {/* Total */}
+      <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+        <span className="text-sm font-semibold text-slate-700">Total Taxes Paid</span>
+        <span className="text-sm font-bold text-slate-900">
+          {fmt(
+            toNum(income.tdsSalary) +
+            (income.tdsNonSalary || []).reduce((s, t) => s + toNum(t.amount), 0) +
+            (income.tdsProperty || []).reduce((s, t) => s + toNum(t.amount), 0) +
+            (income.selfTaxPayments || []).reduce((s, t) => s + toNum(t.amount), 0) +
+            toNum(income.advanceTax) +
+            toNum(income.tcsPaid)
+          )}
+        </span>
+      </div>
+    </div>
+  </div>
+);
+
+/* --- Step 4: Tax Summary --- */
 const Step3TaxSummary = ({ tax, taxSaving, income, personal, navigate }) => (
   <div>
-    {/* ── Refund / Due hero banner ── */}
+    {/* -- Refund / Due hero banner -- */}
     <div
       className={`rounded-2xl p-6 mb-5 text-center shadow-sm ${tax.refundOrDue >= 0 ? "bg-gradient-to-br from-violet-50 to-indigo-50 border border-indigo-200" : "bg-gradient-to-br from-rose-50 to-orange-50 border border-rose-200"}`}
     >
       {tax.refundOrDue >= 0 ? (
         <>
           <p className="text-lg font-extrabold text-indigo-600 mb-1">
-            🎉 You have a tax refund of {fmt(tax.refundOrDue)}
+            ?? You have a tax refund of {fmt(tax.refundOrDue)}
           </p>
           <p className="text-xs text-slate-500">Tax Already Paid exceeds your Tax Liability</p>
         </>
       ) : (
         <>
           <p className="text-lg font-extrabold text-rose-600 mb-1">
-            ⚠ ️ Tax Due: {fmt(Math.abs(tax.refundOrDue))}
+            ?�? Tax Due: {fmt(Math.abs(tax.refundOrDue))}
           </p>
           <p className="text-xs text-slate-500">You need to pay this before filing your return</p>
         </>
@@ -5296,14 +5204,14 @@ const Step3TaxSummary = ({ tax, taxSaving, income, personal, navigate }) => (
       </div>
     </div>
 
-    {/* ── Main computation card ── */}
+    {/* -- Main computation card -- */}
     <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm mb-5">
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 text-white flex items-center gap-3">
         <Calculator size={18} />
         <div>
           <h2 className="font-extrabold text-base">Tax Computation Summary</h2>
           <p className="text-blue-100 text-xs">
-            Tax Year 2026—27 · Income-tax Act, 2025 ·{" "}
+            Tax Year 2026�27 � Income-tax Act, 2025 �{" "}
             {taxSaving.regime === "new" ? "New" : "Old"} Regime
           </p>
         </div>
@@ -5328,7 +5236,7 @@ const Step3TaxSummary = ({ tax, taxSaving, income, personal, navigate }) => (
           value={fmt(taxSaving.regime === "new" ? tax.taxableNew : tax.taxableOld)}
           bold
         />
-        {/* Slab breakdown table — new regime only */}
+        {/* Slab breakdown table � new regime only */}
         {taxSaving.regime === "new" && tax.slabs.length > 0 && (
           <div className="mt-3 mb-2 border border-slate-100 rounded-xl overflow-hidden">
             <div className="bg-slate-50 px-4 py-2 flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wide">
@@ -5341,8 +5249,8 @@ const Step3TaxSummary = ({ tax, taxSaving, income, personal, navigate }) => (
               <div key={s.range} className="flex justify-between px-4 py-2 border-t border-slate-100 text-xs">
                 <span className="text-slate-600 w-24">{s.range}</span>
                 <span className="text-slate-500">{s.rate}</span>
-                <span className="text-slate-700">₹{Math.round(s.income).toLocaleString("en-IN")}</span>
-                <span className="font-semibold text-slate-800">₹{Math.round(s.tax).toLocaleString("en-IN")}</span>
+                <span className="text-slate-700">?{Math.round(s.income).toLocaleString("en-IN")}</span>
+                <span className="font-semibold text-slate-800">?{Math.round(s.tax).toLocaleString("en-IN")}</span>
               </div>
             ))}
           </div>
@@ -5362,27 +5270,27 @@ const Step3TaxSummary = ({ tax, taxSaving, income, personal, navigate }) => (
         <div className="h-2" />
         <SummaryRow
           label="TDS on Salary"
-          value={toNum(income.tdsSalary) > 0 ? `- ${fmt(toNum(income.tdsSalary))}` : "—"}
+          value={toNum(income.tdsSalary) > 0 ? `- ${fmt(toNum(income.tdsSalary))}` : "�"}
         />
         <SummaryRow
           label="Non-Salary TDS"
-          value={toNum(income.tdsNonSalary) > 0 ? `- ${fmt(toNum(income.tdsNonSalary))}` : "—"}
+          value={toNum(income.tdsNonSalary) > 0 ? `- ${fmt(toNum(income.tdsNonSalary))}` : "�"}
         />
         <SummaryRow
           label="Advance Tax Paid"
-          value={toNum(income.advanceTax) > 0 ? `- ${fmt(toNum(income.advanceTax))}` : "—"}
+          value={toNum(income.advanceTax) > 0 ? `- ${fmt(toNum(income.advanceTax))}` : "�"}
         />
         <SummaryRow
           label="TCS Collected"
-          value={toNum(income.tcsPaid) > 0 ? `- ${fmt(toNum(income.tcsPaid))}` : "—"}
+          value={toNum(income.tcsPaid) > 0 ? `- ${fmt(toNum(income.tcsPaid))}` : "�"}
         />
         <SummaryRow label="Tax Already Paid" value={fmt(tax.totalTaxPaid)} bold />
         <div className="h-2" />
         <SummaryRow
           label={
             tax.refundOrDue >= 0
-              ? "🟢 Tax Refund (Taxes Paid — Liability)"
-              : "🔴 Tax Due (Liability — Taxes Paid)"
+              ? "?? Tax Refund (Taxes Paid � Liability)"
+              : "?? Tax Due (Liability � Taxes Paid)"
           }
           value={fmt(Math.abs(tax.refundOrDue))}
           highlight
@@ -5414,15 +5322,15 @@ const Step3TaxSummary = ({ tax, taxSaving, income, personal, navigate }) => (
       <h3 className="font-bold text-slate-900 text-sm mb-4">Filing Details</h3>
       <div className="grid grid-cols-2 gap-3 text-sm">
         {[
-          { l: "Name", v: fullName(personal) || "—" },
-          { l: "PAN", v: personal.pan || "—" },
-          { l: "Date of Birth", v: personal.dob || "—" },
+          { l: "Name", v: fullName(personal) || "�" },
+          { l: "PAN", v: personal.pan || "�" },
+          { l: "Date of Birth", v: personal.dob || "�" },
           {
             l: "Mobile",
-            v: personal.mobile ? `${personal.mobileCountry} ${personal.mobile}` : "—",
+            v: personal.mobile ? `${personal.mobileCountry} ${personal.mobile}` : "�",
           },
-          { l: "Email", v: personal.email || "—" },
-          { l: "City", v: personal.city || "—" },
+          { l: "Email", v: personal.email || "�" },
+          { l: "City", v: personal.city || "�" },
         ].map((item) => (
           <div key={item.l} className="bg-slate-50 rounded-lg p-3">
             <p className="text-xs text-slate-400 mb-1">{item.l}</p>
@@ -5448,12 +5356,13 @@ const Step3TaxSummary = ({ tax, taxSaving, income, personal, navigate }) => (
   </div>
 );
 
-/* ─── Sub-section progress nav ─── */
-const SubSectionNav = ({ step, activeSection }) => {
+/* --- Sub-section progress nav --- */
+const SubSectionNav = ({ step, activeSection, setActiveSection }) => {
   const sections = SUB_SECTIONS[step] ?? [];
   if (sections.length === 0) return null;
 
-  const scrollTo = (id) => {
+  const handleTabClick = (id) => {
+    setActiveSection(id);
     const el = document.getElementById(id);
     if (!el) return;
     // account for navbar (~64px) + this bar (~44px)
@@ -5469,7 +5378,7 @@ const SubSectionNav = ({ step, activeSection }) => {
           <button
             key={sec.id}
             type="button"
-            onClick={() => scrollTo(sec.id)}
+            onClick={() => handleTabClick(sec.id)}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 flex-shrink-0 border ${
               isActive
                 ? "bg-blue-600 text-white border-blue-600 shadow-sm"
@@ -5531,7 +5440,7 @@ const ITRFilingForm = () => {
 
   const [showTestBanner, setShowTestBanner] = useState(true);
 
-  /* ── Personal Info state ── */
+  /* -- Personal Info state -- */
 
   const [personal, setPersonal] = useState({
     firstName: user?.name?.split(" ")[0] || "",
@@ -5583,7 +5492,7 @@ const ITRFilingForm = () => {
     email: user?.email || "",
   });
 
-  /* ── Bank Accounts state ── */
+  /* -- Bank Accounts state -- */
 
   const [bankAccounts, setBankAccounts] = useState([
     { accountNumber: "", ifsc: "", bankName: "", accountType: "" },
@@ -5603,7 +5512,7 @@ const ITRFilingForm = () => {
       b.map((item, idx) => (idx === i ? { ...item, [field]: val } : item)),
     );
 
-  /* ── Salary Entries state ── */
+  /* -- Salary Entries state -- */
 
   const [salaryEntries, setSalaryEntries] = useState(() => {
     const first = newSalaryEntry();
@@ -5636,7 +5545,7 @@ const ITRFilingForm = () => {
 
   const [hraModalEntryId, setHraModalEntryId] = useState(null);
 
-  /* ── Income Sources state ── */
+  /* -- Income Sources state -- */
 
   const [income, setIncome] = useState({
     hasSalary: false,
@@ -5714,7 +5623,7 @@ const ITRFilingForm = () => {
     tcsPaid: "",
   });
 
-  /* ── Tax Saving state ── */
+  /* -- Tax Saving state -- */
 
   const [taxSaving, setTaxSaving] = useState({
     regime: "new",
@@ -5750,7 +5659,7 @@ const ITRFilingForm = () => {
     homeLoan80EEA: "",
   });
 
-  /* ── Fill test data ── */
+  /* -- Fill test data -- */
 
   const fillTestData = (scenario) => {
     setPersonal((p) => ({ ...p, ...scenario.personal }));
@@ -5795,7 +5704,7 @@ const ITRFilingForm = () => {
     }));
   };
 
-  /* ── Validations ── */
+  /* -- Validations -- */
 
   const validatePersonal = () => {
     const e = {};
@@ -5836,7 +5745,7 @@ const ITRFilingForm = () => {
     return e;
   };
 
-  /* ── Tax computation ── */
+  /* -- Tax computation -- */
 
   const tax = useMemo(() => {
     const isResident =
@@ -5856,7 +5765,7 @@ const ITRFilingForm = () => {
       ? salaryEntries.reduce((sum, e) => sum + getSalaryTotal(e, false), 0)
       : 0;
 
-    // ── House property income ──
+    // -- House property income --
 
     const soProps = income.hasHouseProperty
       ? income.selfOccupiedProps || []
@@ -5864,7 +5773,7 @@ const ITRFilingForm = () => {
 
     const letProps = income.hasHouseProperty ? income.letOutProps || [] : [];
 
-    // Self-occupied: home loan interest loss capped at ₹2L total (sec 24(b))
+    // Self-occupied: home loan interest loss capped at ?2L total (sec 24(b))
 
     const soInterestTotal = soProps.reduce(
       (s, p) => s + toNum(p.homeLoanDeduction),
@@ -5987,7 +5896,7 @@ const ITRFilingForm = () => {
       toNum(taxSaving.foreignRetirementRelief),
     );
 
-    // ── Old regime deductions (Chapter VI-A) ──
+    // -- Old regime deductions (Chapter VI-A) --
 
     const d80C = Math.min(toNum(taxSaving.sec80C), 150_000);
 
@@ -6026,7 +5935,7 @@ const ITRFilingForm = () => {
           )
         : 0) +
       Math.min(toNum(taxSaving.nps80CCD), 50_000) +
-      Math.min(toNum(taxSaving.homeLoan80EEA), 150_000); // sec 80EEA cap: ₹1.5L
+      Math.min(toNum(taxSaving.homeLoan80EEA), 150_000); // sec 80EEA cap: ?1.5L
 
     const employerNpsDeduction = toNum(taxSaving.employerNps);
 
@@ -6166,28 +6075,28 @@ const ITRFilingForm = () => {
       taxSaving.regime === "new"
         ? [
             {
-              range: "₹0 — ₹4L",
+              range: "?0 � ?4L",
               rate: "0%",
               income: Math.min(taxableNew, 400_000),
               tax: 0,
             },
 
             {
-              range: "₹4L — ₹8L",
+              range: "?4L � ?8L",
               rate: "5%",
               income: Math.max(0, Math.min(taxableNew, 800_000) - 400_000),
               tax: Math.max(0, Math.min(taxableNew, 800_000) - 400_000) * 0.05,
             },
 
             {
-              range: "₹8L — ₹12L",
+              range: "?8L � ?12L",
               rate: "10%",
               income: Math.max(0, Math.min(taxableNew, 1_200_000) - 800_000),
               tax: Math.max(0, Math.min(taxableNew, 1_200_000) - 800_000) * 0.1,
             },
 
             {
-              range: "₹12L — ₹16L",
+              range: "?12L � ?16L",
               rate: "15%",
               income: Math.max(0, Math.min(taxableNew, 1_600_000) - 1_200_000),
               tax:
@@ -6195,7 +6104,7 @@ const ITRFilingForm = () => {
             },
 
             {
-              range: "₹16L — ₹20L",
+              range: "?16L � ?20L",
               rate: "20%",
               income: Math.max(0, Math.min(taxableNew, 2_000_000) - 1_600_000),
               tax:
@@ -6203,7 +6112,7 @@ const ITRFilingForm = () => {
             },
 
             {
-              range: "₹20L — ₹24L",
+              range: "?20L � ?24L",
               rate: "25%",
               income: Math.max(0, Math.min(taxableNew, 2_400_000) - 2_000_000),
               tax:
@@ -6211,7 +6120,7 @@ const ITRFilingForm = () => {
             },
 
             {
-              range: "Above ₹24L",
+              range: "Above ?24L",
               rate: "30%",
               income: Math.max(0, taxableNew - 2_400_000),
               tax: Math.max(0, taxableNew - 2_400_000) * 0.3,
@@ -6258,7 +6167,7 @@ const ITRFilingForm = () => {
     personal.dob,
   ]);
 
-  /* ── Navigation ── */
+  /* -- Navigation -- */
 
   const goNext = () => {
     if (step === 0) {
@@ -6287,7 +6196,7 @@ const ITRFilingForm = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  /* ────────────────── RENDER ────────────────── */
+  /* ------------------ RENDER ------------------ */
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 font-sans">
@@ -6297,7 +6206,7 @@ const ITRFilingForm = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex gap-6 items-start">
 
-            {/* ── Left sidebar: step progress ── */}
+            {/* -- Left sidebar: step progress -- */}
             <aside className="hidden md:block sticky top-20 self-start">
               <div className="bg-white rounded-2xl border border-slate-200 shadow-sm px-5 py-6 w-56">
                 <StepBar
@@ -6312,13 +6221,13 @@ const ITRFilingForm = () => {
               </div>
             </aside>
 
-            {/* ── Right: form content ── */}
+            {/* -- Right: form content -- */}
             <div className="flex-1 min-w-0">
 
           {/* Sub-section progress nav */}
-          <SubSectionNav step={step} activeSection={activeSection} />
+          <SubSectionNav step={step} activeSection={activeSection} setActiveSection={setActiveSection} />
 
-          {/* ── DEV: Test Data Banner ── */}
+          {/* -- DEV: Test Data Banner -- */}
 
           {showTestBanner && (
             <div className="mb-6 border border-amber-300 bg-amber-50 rounded-2xl overflow-hidden">
@@ -6333,7 +6242,7 @@ const ITRFilingForm = () => {
                   </span>
 
                   <span className="text-xs text-amber-700">
-                    — fill the whole form instantly to verify calculations
+                    � fill the whole form instantly to verify calculations
                   </span>
                 </div>
 
@@ -6363,23 +6272,27 @@ const ITRFilingForm = () => {
             </div>
           )}
 
-          {/* ── STEP 0 : PERSONAL INFO ── */}
+          {/* -- STEP 0 : PERSONAL INFO -- */}
 
           {step === 0 && <Step0PersonalInfo personal={personal} handlePersonal={handlePersonal} errors={errors} bankAccounts={bankAccounts} addBankAccount={addBankAccount} removeBankAccount={removeBankAccount} updateBankAccount={updateBankAccount} setPersonal={setPersonal} setErrors={setErrors} showResidentialModal={showResidentialModal} setShowResidentialModal={setShowResidentialModal} />}
 
-          {/* ── STEP 1 : INCOME SOURCES ── */}
+          {/* -- STEP 1 : INCOME SOURCES -- */}
 
-          {step === 1 && <Step1IncomeSources income={income} handleIncome={handleIncome} setIncome={setIncome} salaryEntries={salaryEntries} editingSalaryId={editingSalaryId} setEditingSalaryId={setEditingSalaryId} addSalaryEntry={addSalaryEntry} removeSalaryEntry={removeSalaryEntry} updateSalaryEntry={updateSalaryEntry} hraModalEntryId={hraModalEntryId} setHraModalEntryId={setHraModalEntryId} taxSaving={taxSaving} personal={personal} />}
+          {step === 1 && <Step1IncomeSources activeSection={activeSection} income={income} handleIncome={handleIncome} setIncome={setIncome} salaryEntries={salaryEntries} editingSalaryId={editingSalaryId} setEditingSalaryId={setEditingSalaryId} addSalaryEntry={addSalaryEntry} removeSalaryEntry={removeSalaryEntry} updateSalaryEntry={updateSalaryEntry} hraModalEntryId={hraModalEntryId} setHraModalEntryId={setHraModalEntryId} taxSaving={taxSaving} personal={personal} />}
 
-          {/* ── STEP 2 : TAX SAVING ── */}
+          {/* -- STEP 2 : TAX SAVING -- */}
 
           {step === 2 && <Step2TaxSaving taxSaving={taxSaving} handleTaxSaving={handleTaxSaving} income={income} tax={tax} personal={personal} />}
 
-          {/* ── STEP 3 : TAX SUMMARY ── */}
+          {/* -- STEP 3 : TAXES PAID -- */}
 
-          {step === 3 && <Step3TaxSummary tax={tax} taxSaving={taxSaving} income={income} personal={personal} navigate={navigate} />}
+          {step === 3 && <Step3TaxesPaymentSection income={income} setIncome={setIncome} handleIncome={handleIncome} />}
 
-          {/* ── Navigation buttons ── */}
+          {/* -- STEP 4 : TAX SUMMARY -- */}
+
+          {step === 4 && <Step3TaxSummary tax={tax} taxSaving={taxSaving} income={income} personal={personal} navigate={navigate} />}
+
+          {/* -- Navigation buttons -- */}
 
           <div className="flex items-center justify-between mt-6 pt-5 border-t border-slate-200">
             <button
@@ -6392,7 +6305,7 @@ const ITRFilingForm = () => {
               {step === 0 ? "Back to Home" : "Previous"}
             </button>
 
-            {step < 3 && (
+            {step < 4 && (
               <button
                 type="button"
                 onClick={goNext}
@@ -6439,4 +6352,7 @@ const ITRFilingForm = () => {
 };
 
 export default ITRFilingForm;
+
+
+
 
