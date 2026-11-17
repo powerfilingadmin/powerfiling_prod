@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle, Clock, Shield, AlertCircle, Award, ArrowLeft }
 import { useEffect, useState } from 'react';
 import Navbar from '../frontend/Navbar';
 import Footer from '../frontend/Footer';
+import RelatedLinks from '../../components/RelatedLinks';
 import { individualServices, businessServices, registrationServices, otherServices } from '../../data/servicesData';
 import { useAuth } from '../../context/AuthContext';
 import { planMapping } from '../../data/planMapping';
@@ -229,6 +230,9 @@ const ServiceDetail = () => {
                 ))}
               </div>
             </div>
+
+          {/* Related services & calculators (internal linking) */}
+          <RelatedLinks serviceId={serviceId} />
 
           {/* CTA Banner */}
           <div className="bg-blue-600 rounded-3xl p-10 text-center text-white shadow-xl shadow-blue-900/10">

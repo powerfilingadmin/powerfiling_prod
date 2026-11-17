@@ -8,7 +8,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <title>PowerFiling – GST & Income Tax Filing | Company Registration India</title>
+    <title>Income Tax Return Filing Online | ITR Filing – PowerFiling</title>
 
     <!-- ✅ Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,38 +17,69 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
-    <!-- Primary Meta -->
-    <meta name="description" content="Expert GST filing, income tax return (ITR), and company incorporation services across India. Trusted by businesses and NRIs worldwide. Fast, affordable, fully online." />
-    <meta name="keywords" content="GST filing, income tax filing, ITR filing, company registration, company incorporation, tax filing for NRI, business registration, online tax filing, India" />
+    <!--
+      SEO NOTE
+      Tags marked data-rh="true" are DEFAULTS for the homepage / non-JS crawlers.
+      react-helmet-async (components/RouteSEO.jsx) replaces them on every route,
+      so inner pages never inherit the homepage title, description or canonical.
+      A static build step (scripts/generate-static-seo.mjs) also writes
+      page-specific copies of this file into dist/ for crawlers that skip JS.
+    -->
+    <meta data-rh="true" name="description" content="File your income tax return online with CA-reviewed ITR filing for salary, capital gains, F&O, crypto, business and NRI income. Simple, secure and accurate." />
     <meta name="author" content="PowerFiling" />
-    <meta name="robots" content="index, follow" />
+    <meta data-rh="true" name="robots" content="index, follow" />
+    <link data-rh="true" rel="canonical" href="https://powerfiling.com/" />
 
     <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
-    <meta property="og:type" content="website" />
     <meta property="og:site_name" content="PowerFiling" />
-    <meta property="og:title" content="PowerFiling – GST & Income Tax Filing | Company Registration India" />
-    <meta property="og:description" content="Expert GST filing, ITR filing, and company incorporation services for businesses and NRIs worldwide. Fully online, fast & affordable." />
-    <meta property="og:url" content="https://powerfiling.com/" />
-    <meta property="og:image" content="https://powerfiling.com/og_img.jpeg" />
+    <meta property="og:locale" content="en_IN" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="PowerFiling – GST & Income Tax Filing Services" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:image:alt" content="PowerFiling – Online Income Tax Return Filing" />
+    <meta data-rh="true" property="og:type" content="website" />
+    <meta data-rh="true" property="og:title" content="Income Tax Return Filing Online | ITR Filing – PowerFiling" />
+    <meta data-rh="true" property="og:description" content="File your income tax return online with CA-reviewed ITR filing for salary, capital gains, F&O, crypto, business and NRI income. Simple, secure and accurate." />
+    <meta data-rh="true" property="og:url" content="https://powerfiling.com/" />
+    <meta data-rh="true" property="og:image" content="https://powerfiling.com/og_img.jpeg" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PowerFiling – GST & Income Tax Filing | Company Registration India" />
-    <meta name="twitter:description" content="Expert GST filing, ITR filing, and company incorporation for businesses and NRIs worldwide." />
-    <meta name="twitter:image" content="https://powerfiling.com/og_img.jpeg" />
-    <meta name="twitter:image:alt" content="PowerFiling – GST & Income Tax Filing Services" />
+    <meta name="twitter:image:alt" content="PowerFiling – Online Income Tax Return Filing" />
+    <meta data-rh="true" name="twitter:title" content="Income Tax Return Filing Online | ITR Filing – PowerFiling" />
+    <meta data-rh="true" name="twitter:description" content="File your income tax return online with CA-reviewed ITR filing for salary, capital gains, F&O, crypto, business and NRI income. Simple, secure and accurate." />
+    <meta data-rh="true" name="twitter:image" content="https://powerfiling.com/og_img.jpeg" />
 
-    <!-- hreflang Tags (Global SEO) -->
-    <link rel="alternate" hreflang="en" href="https://powerfiling.com/" />
-    <link rel="alternate" hreflang="x-default" href="https://powerfiling.com/" />
-
-    <!-- Canonical -->
-    <link rel="canonical" href="https://powerfiling.com/" />
+    <!-- Structured data: Organization + WebSite (site-wide, safe to keep static) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://powerfiling.com/#organization",
+            "name": "PowerFiling",
+            "url": "https://powerfiling.com/",
+            "logo": "https://powerfiling.com/android-chrome-512x512.png",
+            "email": "support@powerfiling.com",
+            "description": "Online income tax return (ITR) filing, GST, company registration and compliance services in India.",
+            "sameAs": [
+              "https://x.com/PowerFiling",
+              "https://www.linkedin.com/in/powerfiling",
+              "https://www.instagram.com/powerfiling",
+              "https://www.facebook.com/share/1bdA8jcc6n/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://powerfiling.com/#website",
+            "url": "https://powerfiling.com/",
+            "name": "PowerFiling",
+            "publisher": { "@id": "https://powerfiling.com/#organization" }
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     
