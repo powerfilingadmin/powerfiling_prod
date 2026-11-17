@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { saveReferralCode } from './utils/referral/referral';
+import RouteSEO from './components/RouteSEO';
 export const captureReferralFromURL = () => {
     try {
         const params = new URLSearchParams(window.location.search);
@@ -32,6 +33,7 @@ const App = () => {
   }, []);
   return (
     <AuthProvider>
+      <RouteSEO />
       <ScrollToTop />
       <AppRoutes />
     </AuthProvider>

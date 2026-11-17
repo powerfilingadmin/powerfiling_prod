@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Clock, Tag, ArrowLeft, ChevronRight, User, CalendarDays, Link2, ArrowUp } from "lucide-react";
-import { Helmet } from "react-helmet-async";
 import Navbar from "../frontend/Navbar";
 import Footer from "../frontend/Footer";
 import blogs from "../../data/blogsData";
@@ -209,16 +208,6 @@ const BlogDetail = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{blog.metaTitle || blog.title}</title>
-        <meta name="description" content={blog.metaDescription || blog.excerpt} />
-        <meta property="og:title" content={blog.metaTitle || blog.title} />
-        <meta property="og:description" content={blog.metaDescription || blog.excerpt} />
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content={blog.metaTitle || blog.title} />
-        <meta name="twitter:description" content={blog.metaDescription || blog.excerpt} />
-      </Helmet>
       <Navbar />
 
       {/* Announcement bar — slides in after 3 seconds */}
