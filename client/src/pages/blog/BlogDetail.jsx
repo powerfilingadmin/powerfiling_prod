@@ -29,11 +29,15 @@ const BlogDetail = () => {
 
   const headings = useMemo(() => {
     if (!blog?.content) return [];
+    // content is already a joined string from blogsData.js; filter blocks that are pure headings
     return blog.content
       .split("\n\n")
-      .filter((para) => para.startsWith("**") && para.endsWith("**"))
+      .filter((para) => {
+        const t = para.trim();
+        return t.startsWith("**") && t.endsWith("**") && !t.slice(2, -2).includes("**");
+      })
       .map((para) => {
-        const title = para.replace(/\*\*/g, "");
+        const title = para.replace(/\*\*/g, "").trim();
         return { id: slugify(title), title };
       });
   }, [blog?.content]);
@@ -99,9 +103,10 @@ const BlogDetail = () => {
     return text.split("\n\n").map((para, i) => {
       if (!para.trim()) return null;
 
-      // Section heading (starts with **)
-      if (para.startsWith("**") && para.endsWith("**")) {
-        const title = para.replace(/\*\*/g, "");
+      // Section heading: entire block is **text** with no nested ** inside
+      const trimmed = para.trim();
+      if (trimmed.startsWith("**") && trimmed.endsWith("**") && !trimmed.slice(2, -2).includes("**")) {
+        const title = trimmed.replace(/\*\*/g, "").trim();
         const headingId = slugify(title);
         return (
           <h2
@@ -171,6 +176,23 @@ const BlogDetail = () => {
             </table>
           </div>
         );
+      }
+
+      // Numbered list item (e.g. "1. **Step**: description")
+      if (/^\d+\.\s/.test(para)) {
+        const match = para.match(/^(\d+)\.\s(.*)/s);
+        if (match) {
+          return (
+            <div key={i} className="group flex gap-3 items-start my-2.5 rounded-xl px-3 py-2.5 transition-all hover:bg-blue-50 hover:text-slate-950">
+              <span className="flex-shrink-0 w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center mt-0.5 shadow-sm">
+                {match[1]}
+              </span>
+              <span className="text-slate-700 text-[15px] leading-7 group-hover:text-slate-950">
+                {renderInline(match[2])}
+              </span>
+            </div>
+          );
+        }
       }
 
       // Bullet list (lines starting with -)
