@@ -47,13 +47,13 @@ const ACCENT = "from-blue-600 to-indigo-600";
  *   triggerPercent  {number}  Scroll depth (0–100) to show. Default: 40
  *   offers          {Array}   Override default offers.
  *   rotateInterval  {number}  Ms between rotations. Default: 6000
- *   brandName       {string}  Footer label. Default: "LedgerLine Services"
+ *   brandName       {string}  Footer label. Default: "Powerfiling"
  */
 const ScrollAdModal = ({
   triggerPercent = 40,
   offers = DEFAULT_OFFERS,
   rotateInterval = 6000,
-  brandName = "LedgerLine Services",
+  brandName = "Powerfiling",
 }) => {
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
