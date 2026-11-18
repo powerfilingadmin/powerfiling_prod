@@ -82,6 +82,13 @@ const BlogDetail = () => {
       }
       const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (linkMatch) {
+        if (linkMatch[2].startsWith("/")) {
+          return (
+            <Link key={j} to={linkMatch[2]} className="text-blue-600 hover:underline font-medium">
+              {linkMatch[1]}
+            </Link>
+          );
+        }
         return (
           <a key={j} href={linkMatch[2]} target="_blank" rel="noopener noreferrer"
             className="text-blue-600 hover:underline font-medium">
