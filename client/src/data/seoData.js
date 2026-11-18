@@ -5,7 +5,7 @@
  * (components/RouteSEO.jsx) and by the Node build script
  * (scripts/generate-static-seo.mjs).
  *
- * After keyword research (Day 2) the SEO team only needs to edit the text in
+ * Day 2: titles / descriptions / `h1` were aligned to the keyword research. To tune them, edit the text in
  * this file – no component changes required.
  *
  * Guidelines: title <= 60 chars, description 120-160 chars, one unique
@@ -23,17 +23,17 @@ export const pageSeo = {
   "/": {
     title: "Income Tax Return Filing Online | ITR Filing – PowerFiling",
     description:
-      "File your income tax return online with CA-reviewed ITR filing for salary, capital gains, F&O, crypto, business and NRI income. Simple, secure and accurate.",
+      "File your ITR online with CA-reviewed ITR filing services for salary, capital gains, F&O, crypto, business and NRI income. Simple, secure and accurate.",
   },
   "/services/individual": {
-    title: "ITR Filing for Individuals – Salary, Gains & NRI",
+    title: "ITR Filing Services for Individuals – Salary, Gains, NRI",
     description:
-      "Online ITR filing for salaried individuals, investors, traders and NRIs. Compare plans for ITR-1, ITR-2, capital gains, F&O, crypto and foreign income.",
+      "Online ITR filing services for salaried individuals, investors, traders and NRIs. Compare plans for ITR-1, ITR-2, capital gains, F&O, crypto and foreign income.",
   },
   "/services/business": {
-    title: "Business ITR Filing – ITR-3, ITR-4 & Professionals",
+    title: "Business ITR Filing Services – ITR-3, ITR-4 & Professionals",
     description:
-      "Income tax return filing for business owners, freelancers and professionals. ITR-3 / ITR-4, presumptive taxation, F&O and crypto trading income handled by CAs.",
+      "Income tax return filing services for business owners, freelancers and professionals. ITR-3 / ITR-4, presumptive taxation, F&O and crypto income handled by CAs.",
   },
   "/calculators": {
     title: "Free Income Tax & EMI Calculators India | PowerFiling",
@@ -56,9 +56,9 @@ export const pageSeo = {
       "Estimate the income tax on your salary and your monthly take-home pay. Includes standard deduction and both tax regimes. Free online calculator.",
   },
   "/calculators/capital-gain-tax": {
-    title: "Capital Gains Tax Calculator – STCG & LTCG India",
+    title: "Capital Gains Tax Calculator India – STCG & LTCG",
     description:
-      "Calculate short-term and long-term capital gains tax on shares, mutual funds and property in India. Free capital gains tax calculator.",
+      "Free capital gains tax calculator for India. Do your capital gain tax calculation for shares, mutual funds and property with short-term and long-term gains.",
   },
   "/calculators/hra-calculator": {
     title: "HRA Exemption Calculator – Section 10(13A) | PowerFiling",
@@ -129,41 +129,49 @@ export const pageSeo = {
 export const serviceSeo = {
   "salary-basic-itr": {
     title: "ITR-1 Filing Online for Salaried Employees | PowerFiling",
+    h1: "Salary ITR Filing Online – ITR-1 for Salaried Employees",
     description:
       "File ITR-1 (Sahaj) online for salary income up to ₹50 lakh. Form 16 verification, 80C/80D deductions and CA-reviewed filing with PowerFiling.",
   },
   "salary-premium": {
     title: "ITR-2 Filing Online – Salary, Property, Gains | PowerFiling",
+    h1: "ITR-2 Filing Online – Salary with Investments & Capital Gains",
     description:
       "ITR-2 filing for salaried professionals with house property, capital gains, dividends and interest income. Tax-saving review and expert consultation.",
   },
   "capital-gain": {
-    title: "Capital Gains Tax Filing – Stocks, MF & Property",
+    title: "Capital Gains Tax Filing Online | Capital Gains ITR",
+    h1: "Capital Gains Tax Filing Online – Capital Gains ITR Filing",
     description:
-      "File ITR with capital gains from shares, mutual funds and property. LTCG and STCG computation, loss set-off and AIS/TIS reconciliation by CAs.",
+      "Capital gains tax filing online for shares, mutual funds and property. Capital gain tax calculation, LTCG/STCG, loss set-off and AIS reconciliation by CAs.",
   },
   "nri-income": {
-    title: "NRI Income Tax Return Filing in India | PowerFiling",
+    title: "NRI ITR Filing Online – NRI Tax Filing in India",
+    h1: "NRI ITR Filing Online – Income Tax Return for NRIs",
     description:
-      "Income tax return filing for NRIs and foreign income. Residential status analysis, DTAA benefits, foreign tax credit and Schedule FA reporting.",
+      "NRI income tax return filing online. Residential status check, DTAA benefits, foreign tax credit, Schedule FA and foreign income ITR filing in India.",
   },
   "business-profession": {
     title: "ITR-3 & ITR-4 Filing for Business & Professionals",
+    h1: "Business & Professional ITR Filing – ITR-3 & ITR-4",
     description:
       "Income tax return filing for business owners, freelancers and professionals. Presumptive taxation (44AD / 44ADA), P&L review and GST reconciliation.",
   },
   "fo-trading": {
-    title: "F&O Trading Income Tax Filing (ITR-3) | PowerFiling",
+    title: "F&O Tax Filing Online – ITR-3 for Futures & Options",
+    h1: "F&O Tax Filing Online – Futures & Options ITR-3",
     description:
-      "File ITR for futures & options trading income. Turnover calculation, speculative income treatment, loss carry-forward and audit applicability check.",
+      "F&O tax filing and tax return filing for futures and options traders. Turnover calculation, loss carry-forward and tax audit applicability check by CAs.",
   },
   "house-property": {
     title: "ITR Filing for House Property & Rental Income | PowerFiling",
+    h1: "ITR Filing for House Property & Rental Income",
     description:
       "File your income tax return for rental income and house property. Home loan interest deduction, multiple properties and self-occupied or let-out support.",
   },
   "crypto-trading": {
     title: "Crypto Tax Filing India – VDA Income Tax Return",
+    h1: "Crypto Tax Filing in India – VDA Income Tax Return",
     description:
       "File ITR for cryptocurrency gains. Virtual digital asset (VDA) reporting, exchange statement reconciliation and 30% tax computation by experts.",
   },
@@ -174,6 +182,7 @@ export const serviceSeo = {
   },
   "gst-registration": {
     title: "GST Registration Online India – Get GSTIN Fast | PowerFiling",
+    h1: "GST Registration Online in India",
     description:
       "Apply for GST registration online. Document preparation, business-type assessment, HSN/SAC guidance and GSTIN certificate support.",
   },
@@ -183,9 +192,10 @@ export const serviceSeo = {
       "Create a Hindu Undivided Family (HUF): HUF deed and declaration drafting, PAN application and bank account opening support.",
   },
   "company-registration": {
-    title: "Private Limited Company Registration Online | PowerFiling",
+    title: "Private Limited Company Registration Online in India",
+    h1: "Private Limited Company Registration Online in India",
     description:
-      "Register a Private Limited Company online. SPICe+ filing, DIN, name approval, MOA/AOA drafting, PAN & TAN and Certificate of Incorporation.",
+      "Private limited company registration online in India: SPICe+ filing, DIN, name approval, MOA/AOA drafting, PAN & TAN and Certificate of Incorporation.",
   },
   "llp-registration": {
     title: "LLP Registration Online India | PowerFiling",
@@ -193,9 +203,10 @@ export const serviceSeo = {
       "Register an LLP online with MCA. Name approval, LLP agreement drafting, PAN & TAN application and Certificate of Incorporation.",
   },
   "gst-filing": {
-    title: "GST Return Filing Online for Businesses | PowerFiling",
+    title: "GST Return Filing Online – GST Filing Services",
+    h1: "GST Return Filing Online – GST Filing Services",
     description:
-      "Online GST return filing and compliance support for businesses and professionals. Accurate, timely filing handled by experts.",
+      "GST return filing online: GSTR-1, GSTR-3B and NIL returns, input tax credit review and sales-purchase reconciliation, with GST filing consultant support.",
   },
   "tds-filing": {
     title: "Form 26QB Filing – TDS on Property (194IA) | PowerFiling",

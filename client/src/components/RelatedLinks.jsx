@@ -24,6 +24,7 @@ const LINKS = {
   "annual-compliance-filing": { to: "/services/annual-compliance-filing", label: "Annual Compliance Filing" },
   dsc: { to: "/services/dsc", label: "Digital Signature Certificate (DSC)" },
   "startup-india-registration": { to: "/services/startup-india-registration", label: "Startup India Registration" },
+  "blog-notice": { to: "/blog/how-to-respond-to-income-tax-notice", label: "How to Respond to an Income Tax Notice" },
   "calc-income-tax": { to: "/calculators/income-tax", label: "Income Tax Calculator" },
   "calc-regime": { to: "/calculators/old-new-regime", label: "Old vs New Regime Calculator" },
   "calc-capital-gain": { to: "/calculators/capital-gain-tax", label: "Capital Gains Tax Calculator" },
@@ -32,12 +33,12 @@ const LINKS = {
 };
 
 const RELATED = {
-  "salary-basic-itr": ["salary-premium", "calc-regime", "calc-income-tax", "house-property"],
-  "salary-premium": ["salary-basic-itr", "capital-gain", "house-property", "calc-regime"],
-  "capital-gain": ["calc-capital-gain", "fo-trading", "crypto-trading", "salary-premium"],
-  "nri-income": ["capital-gain", "house-property", "salary-premium", "calc-income-tax"],
-  "business-profession": ["fo-trading", "gst-registration", "gst-filing", "calc-income-tax"],
-  "fo-trading": ["capital-gain", "business-profession", "crypto-trading", "calc-capital-gain"],
+  "salary-basic-itr": ["salary-premium", "calc-regime", "calc-income-tax", "house-property", "blog-notice"],
+  "salary-premium": ["salary-basic-itr", "capital-gain", "house-property", "calc-regime", "blog-notice"],
+  "capital-gain": ["calc-capital-gain", "fo-trading", "crypto-trading", "salary-premium", "blog-notice"],
+  "nri-income": ["capital-gain", "house-property", "salary-premium", "calc-income-tax", "blog-notice"],
+  "business-profession": ["fo-trading", "gst-registration", "gst-filing", "calc-income-tax", "blog-notice"],
+  "fo-trading": ["capital-gain", "business-profession", "crypto-trading", "calc-capital-gain", "blog-notice"],
   "house-property": ["salary-premium", "capital-gain", "calc-home-loan", "calc-income-tax"],
   "crypto-trading": ["capital-gain", "fo-trading", "salary-premium", "calc-income-tax"],
   "huf-filing": ["huf-registration", "house-property", "capital-gain", "calc-income-tax"],

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Navbar from '../frontend/Navbar';
 import Footer from '../frontend/Footer';
 import RelatedLinks from '../../components/RelatedLinks';
+import { serviceSeo } from '../../data/seoData';
 import { individualServices, businessServices, registrationServices, otherServices } from '../../data/servicesData';
 import { useAuth } from '../../context/AuthContext';
 import { planMapping } from '../../data/planMapping';
@@ -146,7 +147,7 @@ const ServiceDetail = () => {
                 <ServiceIcon size={14} /> {service.title}
               </div>
               <h1 className="text-4xl lg:text-5xl font-extrabold leading-tight mb-4">
-                {service.title}
+                {serviceSeo[serviceId]?.h1 || service.title}
               </h1>
               <p className="text-blue-100 text-lg mb-8 leading-relaxed">
                 {service.description}
