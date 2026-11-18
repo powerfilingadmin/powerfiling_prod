@@ -159,7 +159,7 @@ app.use(cors({
 // Rate limiting - Skip OPTIONS to ensure preflights aren't blocked
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000,
-    max: 100,
+    max: 1000,
     skip: (req) => req.method === 'OPTIONS',
     standardHeaders: true,
     legacyHeaders: false,
