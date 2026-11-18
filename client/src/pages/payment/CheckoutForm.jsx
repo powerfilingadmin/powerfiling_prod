@@ -57,7 +57,7 @@ export default function CheckoutForm({ serviceId, planId, planName, amount: plan
             setCouponMsg({ text: data.message, type: 'success' });
         }
     } catch (err) {
-        setCouponMsg({ text: err.response?.data?.error || 'Invalid coupon code', type: 'error' });
+        setCouponMsg({ text: err.response?.data?.error || err.response.data.message, type: 'error' });
     } finally {
         setCouponValidating(false);
     }

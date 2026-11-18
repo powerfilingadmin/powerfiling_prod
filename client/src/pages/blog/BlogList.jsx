@@ -6,15 +6,15 @@ import Footer from "../frontend/Footer";
 import blogs from "../../data/blogsData";
 
 const topicFilters = [
-  { id: "all", label: "All", keywords: [] },
-  { id: "pan-card", label: "PAN Card", keywords: ["pan card", "permanent account number"] },
-  { id: "application", label: "Application", keywords: ["apply", "application", "online", "new pan"] },
-  { id: "individual", label: "Individual", keywords: ["individual", "students", "minor", "salaried", "freelancer"] },
-  { id: "business", label: "Business & LLP", keywords: ["partnership", "llp", "firm", "business", "gst"] },
-  { id: "company", label: "Company", keywords: ["company", "private limited", "public limited", "director"] },
-  { id: "correction", label: "Correction", keywords: ["correction", "update", "name change", "mismatch"] },
-  { id: "documents", label: "Documents", keywords: ["documents", "proof", "identity", "address proof", "date of birth"] },
-  { id: "pan-2", label: "PAN 2.0", keywords: ["pan 2.0", "qr", "e-pan", "upgrade"] },
+  { id: "all",        label: "All",            keywords: [] },
+  { id: "itr",        label: "ITR Filing",     keywords: ["itr", "income tax return", "filing", "assessment year", "ay 2026", "itr-1", "itr-2", "itr-3", "itr-4", "form 26as", "ais"] },
+  { id: "pan-card",   label: "PAN Card",       keywords: ["pan card", "permanent account number"] },
+  { id: "application",label: "Application",   keywords: ["apply", "application", "online", "new pan"] },
+  { id: "individual", label: "Individual",     keywords: ["individual", "students", "minor", "salaried", "freelancer"] },
+  { id: "business",   label: "Business & LLP", keywords: ["partnership", "llp", "firm", "business", "gst"] },
+  { id: "company",    label: "Company",        keywords: ["company", "private limited", "public limited", "director"] },
+  { id: "correction", label: "Correction",     keywords: ["correction", "update", "name change", "mismatch"] },
+  { id: "pan-2",      label: "PAN 2.0",        keywords: ["pan 2.0", "qr", "e-pan", "upgrade"] },
 ];
 
 const getSearchText = (blog) =>
@@ -22,7 +22,7 @@ const getSearchText = (blog) =>
     blog.title,
     blog.category,
     blog.excerpt,
-    blog.content,
+    Array.isArray(blog.content) ? blog.content.join(" ") : blog.content,
     ...(blog.tags || []),
   ]
     .join(" ")
@@ -144,16 +144,16 @@ const BlogList = () => {
 
           <div className="mb-8 rounded-2xl bg-white border border-slate-100 shadow-sm p-4 sm:p-5">
             <div className="flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
-              {/* <div className="relative flex-1">
+              <div className="relative flex-1">
                 <Search size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
-                  placeholder="Search articles, documents, business PAN, correction..."
+                  placeholder="Search articles..."
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm text-slate-700 outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
                 />
-              </div> */}
-              <p className="text-sm text-slate-500">
+              </div>
+              <p className="text-sm text-slate-500 shrink-0">
                 Showing <span className="font-bold text-slate-900">{filtered.length}</span> articles
               </p>
             </div>
