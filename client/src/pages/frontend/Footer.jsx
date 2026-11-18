@@ -80,7 +80,7 @@ const Footer = () => {
                 { label: "Refund Policy", to: "/refund" },
                 { label: "Disclaimer", to: "/disclaimer" },
                 { label: "Security", to: "/security" },
-                { label: "Terms & Conditions", to: "/terms-and-conditions"}
+                { label: "Terms & Conditions", to: "/terms" }
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.to} className="hover:text-white transition-colors">

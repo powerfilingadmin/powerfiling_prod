@@ -18,6 +18,9 @@ const PaymentSuccess = () => {
         purchaseId: location.state?.purchaseId || null,
         planName: location.state?.planName || null,
     });
+    console.log("===== PaymentSuccess =====");
+console.log("location.state:", location.state);
+console.log("search:", location.search);
 
     useEffect(() => {
         const verifyPayment = async () => {
@@ -43,6 +46,17 @@ const PaymentSuccess = () => {
 
             try {
                 const { data } = await api.post('/payments/confirm', { orderId: orderIdFromUrl });
+                console.log("verifyPayment()");
+
+if (location.state?.purchaseId) {
+    console.log("Using navigation state");
+} else {
+    console.log("No purchaseId in navigation state");
+}
+
+if (!orderIdFromUrl) {
+    console.log("Redirecting to payment-failed because no order_id");
+}
 
                 if (data.success && data.purchaseId) {
                     setPaymentState({

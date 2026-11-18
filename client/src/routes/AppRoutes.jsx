@@ -47,6 +47,7 @@ import ReferralDashboard from '../pages/ReferralDashboard/ReferralDashboard';
 import TermsAndConditions from '../pages/frontend/Terms&Condition';
 import SelfFilingPage from '../pages/SelfFilingPage';
 import ITRFilingForm from '../pages/ITRFilingForm';
+import NotFound from '../pages/frontend/NotFound';
 
 export default function AppRoutes() {
   return (
@@ -61,7 +62,8 @@ export default function AppRoutes() {
       <Route path="/refund" element={<Refund />} />
       <Route path="/terms" element={<TermsAndConditions />} />
       <Route path="/security" element={<Security />} />
-      <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+      {/* Duplicate of /terms -> redirect so only one URL is indexed */}
+      <Route path="/terms-and-conditions" element={<Navigate to="/terms" replace />} />
       <Route path='/sign_up' element={<Sign_up />} />
       <Route path="/verification" element={<UnifiedVerification />} />
       <Route path="/verify-otp" element={<UnifiedVerification />} />
@@ -167,8 +169,8 @@ export default function AppRoutes() {
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/payment-failed" element={<PaymentFailure />} />
 
-      {/* Fallback route for any other services */}
-      <Route path="/services/*" element={<div className="min-h-screen bg-slate-50 flex items-center justify-center"><div className="text-center"><h1 className="text-3xl font-bold text-slate-900 mb-4">Service Page</h1><p className="text-slate-600">This service page is coming soon!</p></div></div>} />
+      {/* 404 – any unknown URL (RouteSEO marks it noindex) */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

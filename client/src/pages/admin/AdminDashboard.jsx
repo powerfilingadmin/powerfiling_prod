@@ -173,7 +173,8 @@ const AdminDashboard = () => {
             }));
             setFilings(mappedFilings);
 
-            calculateStats(usersData, mappedFilings, paymentsData);         
+            calculateStats(usersData, mappedFilings, paymentsData);
+            console.log("LOADING COMPLETED")
 
         } catch (error) {
             console.error('Error fetching admin data:', error);
@@ -183,6 +184,7 @@ const AdminDashboard = () => {
     };
 
     const calculateStats = (usersList, filingsList, paymentsList) => {
+        console.log(paymentsList)
         const totalRevenue = paymentsList.reduce((acc, payment) => {
             const price =  payment.finalAmountPaid || 0;
             return acc + price;
@@ -686,6 +688,7 @@ const AdminDashboard = () => {
             order.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             order.transactionId.toLowerCase().includes(searchQuery.toLowerCase())
         );
+        console.log(filteredOrders);
 
         return (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -801,7 +804,8 @@ const AdminDashboard = () => {
             filing.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
             filing.id.toLowerCase().includes(searchQuery.toLowerCase())
         );
- 
+        console.log(filteredFilings);
+
         return (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
