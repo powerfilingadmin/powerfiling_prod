@@ -17,6 +17,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { Link } from "react-router-dom";
 import plansConfig from "../../data/plansConfig.json";
+import HomeServicesSection from "../../components/HomeServicesSection";
 
 const Home = () => {
 
@@ -123,8 +124,9 @@ const Home = () => {
               <span className="text-blue-600">Easily & Accurately</span>
             </h1>
             <p className="text-xl lg:text-2xl text-slate-600 mb-12 leading-relaxed max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-              Salaried, Business & Capital Gains — Secure, expert-reviewed ITR
-              filing for everyone. Don't risk notices, file with confidence.
+              Secure, CA-reviewed online ITR filing for salaried, business,
+              capital gains, F&O, crypto and NRI taxpayers. Don't risk
+              notices, file with confidence.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
               <Link to="/services/individual" className="w-full sm:w-auto">
@@ -158,12 +160,15 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Services overview + internal links to every focused service page */}
+      <HomeServicesSection />
+
       {/* How It Works */}
       <section className="py-8 bg-slate-50/50 backdrop-blur-sm border-y border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-extrabold text-slate-900 mb-6">
-              How It Works
+              How Online ITR Filing Works
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
               Get your taxes done in 3 simple steps without leaving your home.
@@ -213,7 +218,7 @@ const Home = () => {
                 <Calculator size={120} />
               </div>
               <h2 className="text-4xl font-bold mb-4 relative z-10">
-                Which ITR should I file?
+                Which ITR Form Should You File?
               </h2>
               <p className="text-xl opacity-90 relative z-10 max-w-xl mx-auto">
                 Select your income sources to get an instant recommendation from our AI-powered engine.
@@ -263,11 +268,11 @@ const Home = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-12 bg-slate-50 border-y border-slate-100">
+      <section id="pricing" className="py-12 bg-slate-50 border-y border-slate-100">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-24">
             <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6">
-              Choose Your Perfect Plan
+              ITR Filing Plans & Pricing
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
               Transparent pricing for every taxpayer. From simple salary returns to NRI & capital gain filings.
@@ -281,7 +286,7 @@ const Home = () => {
                 <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-5">
                   <FileText className="w-7 h-7 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Salary (Basic)</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">Salary ITR Filing (Basic)</h3>
                 <p className="text-slate-500 text-sm">For salaried individuals</p>
               </div>
               <div className="mb-8">
@@ -326,7 +331,7 @@ const Home = () => {
                 <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-blue-200">
                   <Calculator className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Salary (Premium)</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">Salary ITR Filing (Premium)</h3>
                 <p className="text-slate-500 text-sm">Multiple income sources</p>
               </div>
               <div className="mb-8">
@@ -367,7 +372,7 @@ const Home = () => {
                 <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-5">
                   <Calculator className="w-7 h-7 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Capital Gain</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">Capital Gains Tax Filing</h3>
                 <p className="text-slate-500 text-sm">Stocks, MF & property gains</p>
               </div>
               <div className="mb-8">
@@ -408,7 +413,7 @@ const Home = () => {
                 <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-5">
                   <MessageSquare className="w-7 h-7 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-1">Foreign / NRI</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-1">NRI & Foreign Income ITR</h3>
                 <p className="text-slate-500 text-sm">NRIs & foreign income</p>
               </div>
               <div className="mb-8">
@@ -562,7 +567,7 @@ const Home = () => {
       <section className="py-12 bg-slate-50/50 backdrop-blur-sm">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-extrabold text-center text-slate-900 mb-16">
-            Frequently Asked Questions
+            Frequently Asked Questions About ITR Filing
           </h2>
           <div className="space-y-4">
             {[
