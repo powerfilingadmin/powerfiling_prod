@@ -1,5 +1,24 @@
 ﻿[
     {
+        "id": "how-to-respond-to-income-tax-notice",
+        "title": "How to Respond to an Income Tax Notice: Step-by-Step Guide",
+        "metaTitle": "How to Respond to an Income Tax Notice – Step-by-Step",
+        "metaDescription": "Got an income tax notice? Learn the common notice types, how to check it is genuine, and how to reply online on the e-filing portal with the right documents.",
+        "category": "Income Tax Notices & Compliance",
+        "date": "November 18, 2026",
+        "author": "Tax Compliance Team",
+        "readTime": "7 min read",
+        "excerpt": "Received an income tax notice? Learn the common types of notices, how to confirm a notice is genuine, what documents to keep ready and how to submit your reply online.",
+        "content": "Receiving a notice from the Income Tax Department can be stressful, but most notices are routine and can be handled calmly if you understand what the notice is asking for. This guide explains the common types of income tax notices, how to check that a notice is genuine, and how to prepare and submit your reply online.\n\n**Important**: The Income-tax Act, 2025 came into force on 1 April 2026, but notices and proceedings for Assessment Year (AY) 2026-27 and earlier years continue under the Income-tax Act, 1961. Section numbers mentioned below refer to the 1961 Act. The new Act applies from Tax Year 2026-27 onwards.\n\n**Common Types of Income Tax Notices**\n\nNot every communication from the department is a demand for tax. The first step is to identify what type of notice you have received:\n\n| Type of notice | What it usually means |\n|---|---|\n| Intimation after processing (Section 143(1)) | Your return has been processed. It may show a refund, no change, or a mismatch with the return you filed. |\n| Defective return (Section 139(9)) | The department found an error or missing information in the return and asks you to correct it. |\n| Request for information (Section 142(1)) | The department asks for documents or explanations about your return. |\n| Scrutiny notice (Section 143(2)) | Your return has been selected for a detailed examination. |\n| Reassessment or escaped income (Sections 148A / 148) | The department believes some income may not have been assessed. |\n| Demand notice (Section 156) | The department says tax, interest or a penalty is payable. |\n\n**Step 1: Read the Notice Carefully**\n\nBefore replying, note these details from the notice:\n- The section under which the notice is issued\n- The assessment year it relates to\n- The last date to respond\n- The Document Identification Number (DIN)\n- The specific information, documents or explanation being asked for\n\n**Step 2: Check That the Notice Is Genuine**\n\nFake notices and phishing emails are common. A genuine notice carries a DIN and is also available when you log in to the e-filing portal of the Income Tax Department. The department does not ask for your password, OTP, card details or bank PIN by email or phone. If in doubt, log in to the official portal yourself instead of clicking a link in the message.\n\n**Step 3: Gather the Right Documents**\n\nDepending on the notice, you may need:\n- A copy of the return you filed and its acknowledgement\n- Form 16, TDS certificates, Form 26AS and AIS (see [AIS vs Form 26AS](/blog/ais-vs-form-26as-key-differences))\n- Bank statements and interest certificates\n- Investment and deduction proofs\n- Rent receipts and home loan certificates\n- Broker, mutual fund and property sale statements for capital gains or trading income\n\n**Step 4: Respond Online Before the Due Date**\n\nMost notices are answered on the e-filing portal. Log in with your PAN, then look for the pending action or e-Proceedings section (menu names on the portal may change). Upload your reply and supporting documents, submit it, and save the acknowledgement. For a defective return notice, the correction is generally required within 15 days of the notice, unless an extension is granted.\n\n**Step 5: Keep a Record**\n\nSave the notice, your reply, the supporting documents and the acknowledgement. You may need them again if the department raises further questions.\n\n**What Happens If You Ignore a Notice?**\n\nIgnoring a notice can lead to an assessment based on the information the department already has, along with interest and penalties. Even if you believe the notice is wrong, it is safer to respond within the time given and explain your position with documents.\n\n**When to Get Professional Help**\n\nConsider expert help if:\n- You received a scrutiny or reassessment notice\n- The demand is large or you disagree with the department's computation\n- The notice relates to capital gains, F&O or crypto income, or foreign assets\n- You are an NRI with income in India and abroad\n- You are unsure which documents to submit\n\nAccurate filing in the first place reduces the chance of a notice. See PowerFiling's services for [salary ITR filing](/services/salary-basic-itr), [capital gains tax filing](/services/capital-gain), [F&O tax filing](/services/fo-trading) and [NRI ITR filing](/services/nri-income), or [contact us](/contact) if you need help understanding a notice you have received.\n\n**Frequently Asked Questions**\n\n**What should I do first when I receive an income tax notice?**\nRead it carefully, note the section, assessment year and due date, and confirm that it is genuine by logging in to the e-filing portal.\n\n**Is every income tax notice a demand for tax?**\nNo. Many notices are intimations, requests for clarification or requests to correct a return. Only a demand notice says that tax, interest or penalty is payable.\n\n**Can I reply to an income tax notice online?**\nYes. Most notices are answered through the e-filing portal, where you can upload your explanation and documents.\n\n**How long do I have to reply to an income tax notice?**\nThe time limit is stated in the notice itself, and it differs by notice type. Reply within that date.\n\n**Will a notice under the 1961 Act still apply after 1 April 2026?**\nYes. Notices and proceedings for AY 2026-27 and earlier years continue under the Income-tax Act, 1961, even if they are issued after the new Act came into force.\n\nTax rules, forms and portal features can change, so always refer to the latest official guidance from the Income Tax Department. This article is for general information and is not professional tax advice.",
+        "tags": [
+            "Income Tax Notice",
+            "Income Tax Notice Reply",
+            "e-Proceedings",
+            "ITR Filing",
+            "Tax Compliance"
+        ]
+    },
+    {
         "id":  "which-itr-form-should-i-file",
         "title":  "Which ITR Form Should I File? Complete Guide to ITR-1, ITR-2, ITR-3 and ITR-4",
         "metaTitle":  "Which ITR Form Should I File? ITR-1 to ITR-4 Guide",
@@ -111,7 +130,7 @@
         "id":  "ais-vs-form-26as-key-differences",
         "title":  "AIS vs Form 26AS: Key Differences and How to Check Online",
         "metaTitle":  "AIS vs Form 26AS: Key Differences \u0026 Online Check",
-        "metaDescription":  "Learn the key differences between AIS and Form 26AS, understand Form 168 for Tax Year 2026-27, and discover how to access these statements online before filing your ITR.",
+        "metaDescription":  "Learn the differences between AIS and Form 26AS, understand Form 168 for Tax Year 2026-27 and how to access these statements online before filing your ITR.",
         "category":  "Income Tax Statements \u0026 Compliance",
         "date":  "July 15, 2025",
         "author":  "Tax Compliance Team",
@@ -213,7 +232,7 @@
     {
         "id":  "how-to-file-itr-online-ay-2026-27",
         "title":  "How to File ITR Online in India for AY 2026-27: Step-by-Step Guide",
-        "metaTitle":  "How to File ITR Online for AY 2026-27 - Complete Step-by-Step Guide",
+        "metaTitle":  "How to File ITR Online for AY 2026-27: Step-by-Step Guide",
         "metaDescription":  "Learn how to file ITR online in India for AY 2026-27. Understand the required documents, ITR forms, filing steps, tax details and e-verification process.",
         "category":  "Income Tax Return",
         "date":  "June 10, 2025",
@@ -321,8 +340,8 @@
     {
         "id":  "pan-card-complete-guide-2026",
         "title":  "PAN Card in India: Types, Eligibility, Application Process, Documents \u0026 Benefits (2026 Guide)",
-        "metaTitle":  "PAN Card Guide 2026: Types, Eligibility, Documents \u0026 Online Application Process",
-        "metaDescription":  "Learn everything about PAN Card in India, including eligibility, types, application process, required documents, fees, benefits, and how to apply online in 2026.",
+        "metaTitle":  "PAN Card Guide 2026: Types, Eligibility & How to Apply",
+        "metaDescription":  "Everything about the PAN card in India: eligibility, types, required documents, fees, benefits and how to apply online in 2026.",
         "category":  "PAN Card",
         "date":  "May 20, 2025",
         "author":  "Tax Compliance Team",
@@ -484,7 +503,7 @@
                      "Income Tax"
                  ],
         "metaTitle":  "How to Apply for a PAN Card as an Individual in India",
-        "metaDescription":  "Learn how to apply for a PAN card as an individual in India. Step-by-step guide covering eligibility, required documents, online application process and common mistakes to avoid."
+        "metaDescription":  "Learn how to apply for a PAN card as an individual in India, the documents required and the steps to apply, as issued by the Income Tax Department."
     },
     {
         "id":  "pan-card-partnership-llp",
@@ -548,7 +567,7 @@
                      "Compliance"
                  ],
         "metaTitle":  "How to Get a PAN Card for a Partnership Firm or LLP in India",
-        "metaDescription":  "Step-by-step guide to applying for a PAN card for a Partnership Firm or LLP in India. Covers eligibility, required documents, online application process and benefits."
+        "metaDescription":  "Learn how to get a PAN card for a partnership firm or LLP in India, including the steps to apply and why the firm needs a PAN."
     },
     {
         "id":  "pan-card-company",
@@ -615,7 +634,7 @@
                      "Compliance"
                  ],
         "metaTitle":  "How to Get a PAN Card for Your Company in India",
-        "metaDescription":  "Learn how to apply for a PAN card for your company in India. Complete guide covering eligibility, required documents, the online application process and common mistakes."
+        "metaDescription":  "Every company in India needs a PAN. Learn how to apply for a company PAN card, the steps involved and why it matters for tax compliance."
     },
     {
         "id":  "pan-card-correction-2026",
@@ -742,7 +761,7 @@
                      "2026",
                      "PAN 2.0"
                  ],
-        "metaTitle":  "PAN Card Correction Online 2026: Complete Guide to Update PAN Details",
-        "metaDescription":  "Learn how to correct or update your PAN card online in 2026. Complete guide covering name change, date of birth update, PAN 2.0 features, fees and step-by-step process."
+        "metaTitle":  "PAN Card Correction Online: What You Need to Know (2026)",
+        "metaDescription":  "Learn how to correct details on your PAN card online in 2026 and why accurate PAN details matter for ITR filing, bank accounts and KYC."
     }
 ]

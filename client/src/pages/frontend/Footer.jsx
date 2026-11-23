@@ -80,7 +80,7 @@ const Footer = () => {
                 { label: "Refund Policy", to: "/refund" },
                 { label: "Disclaimer", to: "/disclaimer" },
                 { label: "Security", to: "/security" },
-                { label: "Terms & Conditions", to: "/terms-and-conditions"}
+                { label: "Terms & Conditions", to: "/terms" }
               ].map((item) => (
                 <li key={item.label}>
                   <Link to={item.to} className="hover:text-white transition-colors">
@@ -148,7 +148,7 @@ const Footer = () => {
           <p>© 2026 Powerfiling Pvt. Ltd. All rights reserved. Designed for Indian Taxpayers.</p>
           <div className="flex items-center gap-4">
             <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
-            <Link to="/disclaimer" className="hover:text-white transition-colors">Terms</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
             <Link to="/refund" className="hover:text-white transition-colors">Refunds</Link>
             <Link to="/contact" className="hover:text-white transition-colors">Contact</Link>
             

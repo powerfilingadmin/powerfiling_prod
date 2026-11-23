@@ -1,14 +1,17 @@
 User-agent: *
 Allow: /
 
-Disallow: /dashboard/
-Disallow: /admin/
-Disallow: /payment/
-Disallow: /order/
+# Private / transactional pages. No trailing slash on purpose: it makes the
+# rule match the page itself AND everything below it (e.g. /payment-success).
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /payment
+Disallow: /order
 Disallow: /login
 Disallow: /sign_up
 Disallow: /verification
 Disallow: /verify-otp
 Disallow: /verify-mobile
+Disallow: /services/userform
 
 Sitemap: https://powerfiling.com/sitemap.xml
