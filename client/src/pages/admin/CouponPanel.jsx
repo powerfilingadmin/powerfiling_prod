@@ -20,6 +20,7 @@ const CouponPanel = () => {
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
     const [copied, setCopied] = useState('');
+    const [selectedCoupon, setSelectedCoupon] = useState(null);
 
     const fetchAll = async () => {
         setLoading(true);
@@ -29,6 +30,7 @@ const CouponPanel = () => {
                 api.get('/plans') // adjust if your plans endpoint differs
             ]);
             if (couponsRes.data.success) setCoupons(couponsRes.data.data);
+            console.log('Fetched coupons:', couponsRes.data.data);
             if (plansRes.data.success) setPlans(plansRes.data.data);
         } catch (err) {
             console.error('[CouponPanel] fetch error:', err);
@@ -287,8 +289,19 @@ const CouponPanel = () => {
                                         <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
                                             !c.isActive ? 'bg-zinc-700 text-zinc-400' : isExpired(c.expiresAt) ? 'bg-red-900/40 text-red-400' : 'bg-green-900/40 text-green-400'
                                         }`}>{!c.isActive ? 'Inactive' : isExpired(c.expiresAt) ? 'Expired' : 'Active'}</span>
-                                        <span className="text-xs text-zinc-500">{c.totalUses} uses</span>
-                                        <span className="text-xs text-zinc-500">{c.applicablePlans?.length ? `${c.applicablePlans.length} plan(s)` : 'All plans'}</span>
+                                       
+
+                                    {c.usedBy?.length > 0 && (
+                                        <button
+                                            onClick={() => setSelectedCoupon(c)}
+                                            className="text-xs text-blue-400 font-medium"
+                                        >
+                                            <span className="text-xs hover:text-blue-300">
+                                        {c.totalUses} uses
+                                    </span>
+                                        </button>
+                                    )}
+                                        <span className="text-xs text-zinc-500 mt-1">| {c.applicablePlans?.length ? `${c.applicablePlans.length} plan(s)` : 'All plans'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -303,6 +316,60 @@ const CouponPanel = () => {
                     ))}
                 </div>
             )}
+            {selectedCoupon && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="w-full max-w-lg rounded-2xl bg-zinc-900 border border-zinc-700 shadow-2xl">
+
+            <div className="flex items-center justify-between p-5 border-b border-zinc-800">
+                <div>
+                    <h3 className="text-lg font-bold text-white">
+                        Coupon Users
+                    </h3>
+                    <p className="text-sm text-zinc-400">
+                        {selectedCoupon.code}
+                    </p>
+                </div>
+
+                <button
+                    onClick={() => setSelectedCoupon(null)}
+                    className="text-zinc-400 hover:text-white text-xl"
+                >
+                    ✕
+                </button>
+            </div>
+            <div className="max-h-80 overflow-y-auto p-5 space-y-2">
+                {selectedCoupon.usedBy.map((u, index) => (
+                    <div
+                        key={index}
+                        className="flex items-center justify-between rounded-xl bg-zinc-800 px-4 py-3"
+                    >
+                        <span className="font-mono text-sm text-zinc-300">
+                            {u.userId}
+                        </span>
+                        <p className="text-xs text-zinc-500 ">
+                    Used on{" "}
+                    {new Date(u.usedAt).toLocaleString("en-IN", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                    })}
+                </p>
+
+                        <button
+                            onClick={() => handleCopy(u.userId)}
+                            className="text-zinc-400 hover:text-white"
+                        >
+                            {copied === u.userId ? (
+                                <Check size={15} className="text-green-400" />
+                            ) : (
+                                <Copy size={15} />
+                            )}
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+)}
         </div>
     );
 };
